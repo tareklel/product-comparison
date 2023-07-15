@@ -11,9 +11,9 @@ class setup_comparison:
         self.input_path = input_path
         self.output_path = output_path
 
-    def read_files(self):
+    def find_files(self):
         """
-        Read all csvs in input folder
+        Find all csvs in input folder
         """
         try:
             self.csv_files = glob.glob(os.path.join(self.input_path, '*.csv'))

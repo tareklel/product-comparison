@@ -14,7 +14,7 @@ class TestSetupComparison(unittest.TestCase):
         ]
 
         # Test the read_files method
-        self.test_obj.read_files()
+        self.test_obj.find_files()
 
         # Check if the CSV files list matches the expected list
         self.assertEqual(self.test_obj.csv_files, expected_csv_files)
