@@ -1,0 +1,12 @@
+data_config:
+  inpsection_order:
+    [
+      "crawl_date",
+      "country",
+      "gender",
+      "brand",
+      "category",
+      "site",
+      "product_name",
+    ]
+  site: ["Farfetch", "Ounass"]
