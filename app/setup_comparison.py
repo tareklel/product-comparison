@@ -54,7 +54,7 @@ class setup_comparison:
     def standardize_files(self, dictionary_dir='dictionary/', reference='portals', standard='standard'):
         """
         Standardize input files, add standardized file objects.
-        
+
         Parameters:
         - dictionary_dir: Path to the directory containing dictionary CSV files.
         - reference: Column name in the input data to be used as a reference for standardization.
@@ -73,13 +73,15 @@ class setup_comparison:
             # Apply each dictionary to the input file
             for dict_file in dict_files:
                 # Get category to replace from dictionary filename
-                replacement_category = os.path.basename(os.path.splitext(dict_file)[0])
+                replacement_category = os.path.basename(
+                    os.path.splitext(dict_file)[0])
 
                 # Load dictionary data
                 compare_df = pd.read_csv(dict_file)
 
                 # Apply mapping to the data
-                df = self.map_df(df, compare_df, replacement_category, standard, reference)
+                df = self.map_df(
+                    df, compare_df, replacement_category, standard, reference)
 
             # Add standardized DataFrame to 'modified' attribute
             if not hasattr(self, 'modified'):
@@ -87,5 +89,23 @@ class setup_comparison:
 
             # Prepare modified dictionary name
             modified_dict_name = f"{os.path.basename(os.path.splitext(input_file)[0])}-modified"
-            
+
             self.modified[modified_dict_name] = df
+
+    def find_combinations(self, order: list, df: pd.DataFrame, dictionary: dict):
+        """
+        return nested dictionary tree with all products from files 
+        """
+        for _, row in df.iterrows():
+            curr_dict = dictionary
+            for key in order[:-1]:
+                if key not in curr_dict:
+                    curr_dict[key] = {}
+                curr_dict = curr_dict[key]
+                if str(row[key]) not in curr_dict:
+                    curr_dict[str(row[key])] = {}
+                curr_dict = curr_dict[str(row[key])]
+            
+            curr_dict[order[-1]] = row[order[-1]]
+
+        return dictionary

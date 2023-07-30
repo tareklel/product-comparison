@@ -8,8 +8,8 @@ from pandas.testing import assert_frame_equal
 class TestSetupComparison(unittest.TestCase):
     def setUp(self):
         self.test_obj = setup_comparison(input_path='app/tests/resources/input',
-                                         output_path='app/tests/resources/output', 
-                                         conf='app/tests/resources/inspecting.yml') 
+                                         output_path='app/tests/resources/output',
+                                         conf='app/tests/resources/inspecting.yml')
 
     def test_read_files(self):
         expected_csv_files = [
@@ -45,10 +45,25 @@ class TestSetupComparison(unittest.TestCase):
 
     def test_standardize_files(self):
         self.test_obj.set_input_files()
-        self.test_obj.standardize_files('app/tests/resources/dictionary/', 'site', 'standard')
-        compare1 = pd.read_csv('app/tests/resources/compare/farfetch-2023-06-18.csv')
+        self.test_obj.standardize_files(
+            'app/tests/resources/dictionary/', 'site', 'standard')
+        compare1 = pd.read_csv(
+            'app/tests/resources/compare/farfetch-2023-06-18.csv')
         compare2 = self.test_obj.modified['farfetch-2023-06-18-modified']
         assert_frame_equal(compare1, compare2)
+
+    def test_find_combinations(self):
+        order = ['country', 'product', 'description']
+        df = pd.DataFrame({'country': ['us', 'us', 'uk'], 'product': [
+                          'x', 'y', 'x'], 'description': ['its', 'a', 'product']})
+        dict = {}
+        nested_tree = {'country': {
+            'us': {'product':
+            {'x': {'description': 'its'}, 
+             'y': {'description': 'a'}}}, 
+             'uk': {'product': {'x': {'description': 'product'}}}}}
+        tree = self.test_obj.find_combinations(order, df, dict)
+        self.assertEqual(tree, nested_tree)
 
 
 if __name__ == '__main__':
