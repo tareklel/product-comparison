@@ -3,6 +3,7 @@ from app.setup_comparison import setup_comparison
 import unittest
 import pandas as pd
 from pandas.testing import assert_frame_equal
+import json
 
 
 class TestSetupComparison(unittest.TestCase):
@@ -10,6 +11,12 @@ class TestSetupComparison(unittest.TestCase):
         self.test_obj = setup_comparison(input_path='app/tests/resources/input',
                                          output_path='app/tests/resources/output',
                                          conf='app/tests/resources/inspecting.yml')
+        
+        self.test_obj.nested_tree = {'country': {
+            'us': {'product':
+                   {'x': {'description': 'its'},
+                    'y': {'description': 'a'}}},
+            'uk': {'product': {'x': {'description': 'product'}}}}}
 
     def test_read_files(self):
         expected_csv_files = [
@@ -57,13 +64,40 @@ class TestSetupComparison(unittest.TestCase):
         df = pd.DataFrame({'country': ['us', 'us', 'uk'], 'product': [
                           'x', 'y', 'x'], 'description': ['its', 'a', 'product']})
         dict = {}
-        nested_tree = {'country': {
-            'us': {'product':
-            {'x': {'description': 'its'}, 
-             'y': {'description': 'a'}}}, 
-             'uk': {'product': {'x': {'description': 'product'}}}}}
         tree = self.test_obj.find_combinations(order, df, dict)
-        self.assertEqual(tree, nested_tree)
+        self.assertEqual(tree, self.test_obj.nested_tree)
+    
+    def test_update_json(self):
+        path = 'app/tests/resources/json/test_find_combinations.json'
+        try:
+            os.remove(path)
+        except FileNotFoundError:
+            pass
+
+        with open(path, 'w') as f:
+            json.dump(self.test_obj.nested_tree, f)
+        
+        test_json = {'country': {
+            'us': {'product':
+                   {'x': {'description': 'its'},
+                    'y': {'description': 'a'}}},
+            'uk': {'product': {'x': {'description': 'product'}, 'z': {'description': 'le'}}}}}
+        
+        
+        self.test_obj.data['inspection_order'] = ['country', 'product', 'description']
+        self.test_obj.modified = {}
+        self.test_obj.modified['mod-modified'] = pd.DataFrame({'country': ['uk'], 'product': [
+                          'z'], 'description': ['le']})
+
+        self.test_obj.update_json(path, True)
+        with open(path, 'r') as f:
+            modified_json = json.load(f)
+        
+        self.assertEqual(modified_json, test_json)
+
+        os.remove(path)
+
+         
 
 
 if __name__ == '__main__':

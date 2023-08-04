@@ -109,3 +109,17 @@ class setup_comparison:
             curr_dict[order[-1]] = row[order[-1]]
 
         return dictionary
+
+    
+    def update_json(self, file_json: str, modified: bool):
+        with open(file_json, 'r') as f:
+            dict = json.load(f) 
+        
+        if modified:
+            for df in self.modified.values():
+                dict = self.find_combinations(self.data['inpsection_order'], df, dict)
+        
+        with open(file_json, 'w') as f:
+            json.dump(dict, f)
+
+        return None

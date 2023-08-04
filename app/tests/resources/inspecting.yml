@@ -1,12 +1,3 @@
 data_config:
-  inpsection_order:
-    [
-      "crawl_date",
-      "country",
-      "gender",
-      "brand",
-      "category",
-      "site",
-      "product_name",
-    ]
+  inpsection_order: ["country", "product", "description"]
   site: ["Farfetch", "Ounass"]
