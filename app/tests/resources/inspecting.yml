@@ -1,3 +1,11 @@
 data_config:
   inpsection_order: ["country", "product", "description"]
   site: ["Farfetch", "Ounass"]
+
+input_path: "app/tests/resources/input"
+output_path: "app/tests/resources/output"
+dictionary_dir: "app/tests/resources/dictionary"
+reference: "site"
+standard: "standard"
+tree_path: "app/tests/resources/output"
+

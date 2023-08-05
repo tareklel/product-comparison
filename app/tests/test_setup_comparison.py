@@ -8,10 +8,9 @@ import json
 
 class TestSetupComparison(unittest.TestCase):
     def setUp(self):
-        self.test_obj = setup_comparison(input_path='app/tests/resources/input',
-                                         output_path='app/tests/resources/output',
-                                         conf='app/tests/resources/inspecting.yml')
-        
+        self.test_obj = setup_comparison(
+            conf='app/tests/resources/inspecting.yml')
+
         self.test_obj.nested_tree = {'country': {
             'us': {'product':
                    {'x': {'description': 'its'},
@@ -52,8 +51,7 @@ class TestSetupComparison(unittest.TestCase):
 
     def test_standardize_files(self):
         self.test_obj.set_input_files()
-        self.test_obj.standardize_files(
-            'app/tests/resources/dictionary/', 'site', 'standard')
+        self.test_obj.standardize_files()
         compare1 = pd.read_csv(
             'app/tests/resources/compare/farfetch-2023-06-18.csv')
         compare2 = self.test_obj.modified['farfetch-2023-06-18-modified']
@@ -66,39 +64,39 @@ class TestSetupComparison(unittest.TestCase):
         dict = {}
         tree = self.test_obj.find_combinations(order, df, dict)
         self.assertEqual(tree, self.test_obj.nested_tree)
-    
+
     def test_update_json(self):
         path = 'app/tests/resources/json/test_find_combinations.json'
-        try:
-            os.remove(path)
-        except FileNotFoundError:
-            pass
 
         with open(path, 'w') as f:
             json.dump(self.test_obj.nested_tree, f)
-        
+
         test_json = {'country': {
             'us': {'product':
                    {'x': {'description': 'its'},
                     'y': {'description': 'a'}}},
             'uk': {'product': {'x': {'description': 'product'}, 'z': {'description': 'le'}}}}}
-        
-        
-        self.test_obj.data['inspection_order'] = ['country', 'product', 'description']
+
+        self.test_obj.data['inspection_order'] = [
+            'country', 'product', 'description']
         self.test_obj.modified = {}
         self.test_obj.modified['mod-modified'] = pd.DataFrame({'country': ['uk'], 'product': [
-                          'z'], 'description': ['le']})
+            'z'], 'description': ['le']})
 
         self.test_obj.update_json(path, True)
         with open(path, 'r') as f:
             modified_json = json.load(f)
-        
+
         self.assertEqual(modified_json, test_json)
 
         os.remove(path)
-
-         
-
+    
+    def test_create_json(self):
+        self.test_obj.set_input_files()
+        self.test_obj.create_json()
+        test_path = 'app/tests/resources/output/farfetch-2023-06-18_ounass-2023-06-18.json'
+        self.assertTrue(os.path.exists(test_path))
+        os.remove(test_path)
 
 if __name__ == '__main__':
     unittest.main()

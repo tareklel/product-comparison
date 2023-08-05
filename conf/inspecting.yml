@@ -8,5 +8,11 @@ data_config:
       "category",
       "site",
       "product_name",
+      "image_url"
     ]
-  portals: ["Farfetch", "Ounass"]
+portals: ["Farfetch", "Ounass"]
+input_path: "input/mini/"
+standard: "standard"
+dictionary_dir: "app/tests/resources/dictionary"
+reference: "site"
+tree_path: "output/"

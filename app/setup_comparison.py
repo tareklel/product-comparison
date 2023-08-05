@@ -11,12 +11,17 @@ class setup_comparison:
     get and organize products to compare
     """
 
-    def __init__(self, input_path='input/', output_path='output/', conf='conf/inspecting.yml'):
-        self.input_path = input_path
-        self.output_path = output_path
+    def __init__(self, conf='conf/inspecting.yml'):
 
         with open(conf, 'r') as file:
-            self.data = yaml.safe_load(file)['data_config']
+            conf_dict = yaml.safe_load(file)
+            self.data = conf_dict['data_config']
+            self.input_path = conf_dict['input_path']
+            self.output_path = conf_dict['output_path']
+            self.dictionary_dir = conf_dict['dictionary_dir']
+            self.reference = conf_dict['reference']
+            self.standard = conf_dict['standard']
+            self.conf = conf_dict
 
     def find_files(self, path, ext):
         """
@@ -31,8 +36,11 @@ class setup_comparison:
         except OSError as e:
             print(f"Error reading directory: {e}")
 
-    def set_input_files(self):
-        self.input_files = self.find_files(self.input_path, 'csv')
+    def set_input_files(self, path=None, ext='csv'):
+        if not path:
+            path = self.input_path
+
+        self.input_files = self.find_files(self.input_path, ext)
 
     def map_df(self, df: pd.DataFrame, compare_df: pd.DataFrame, to_replace: str,
                replacement_col: str, reference_col: str
@@ -51,7 +59,7 @@ class setup_comparison:
                                                        to_replace].replace(compare_mapping)
         return df
 
-    def standardize_files(self, dictionary_dir='dictionary/', reference='portals', standard='standard'):
+    def standardize_files(self, dictionary_dir=None, reference=None, standard=None):
         """
         Standardize input files, add standardized file objects.
 
@@ -60,6 +68,13 @@ class setup_comparison:
         - reference: Column name in the input data to be used as a reference for standardization.
         - standard: Column name in the dictionary data that contains the standard values.
         """
+
+        if not dictionary_dir:
+            dictionary_dir = self.dictionary_dir
+        if not reference:
+            reference = self.reference
+        if not standard:
+            standard = self.standard
         # Get dictionary files
         dict_files = self.find_files(dictionary_dir, 'csv')
 
@@ -118,8 +133,27 @@ class setup_comparison:
         if modified:
             for df in self.modified.values():
                 dict = self.find_combinations(self.data['inpsection_order'], df, dict)
+        else:
+            for input_file in self.input_files:
+                df = pd.read_csv(input_file)
+                dict = self.find_combinations(self.data['inpsection_order'], df, dict)
+
         
         with open(file_json, 'w') as f:
             json.dump(dict, f)
 
         return None
+    
+    def create_json(self, file_json: str=None):
+        if not file_json:
+            input_files = [x.split('/')[-1].split('.')[0] for x in self.input_files]
+            files = "_".join(input_files)
+            file_json = self.conf['tree_path']+'/'+files+'.json'
+        # Create an empty dictionary
+        data = {}
+
+        # Use the json.dump method to write the empty dictionary to a file
+        if not os.path.exists(file_json):
+            with open(file_json, 'w') as f:
+                json.dump(data, f)
+
