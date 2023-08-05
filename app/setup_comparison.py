@@ -120,35 +120,18 @@ class setup_comparison:
                 if str(row[key]) not in curr_dict:
                     curr_dict[str(row[key])] = {}
                 curr_dict = curr_dict[str(row[key])]
-            
+
             curr_dict[order[-1]] = row[order[-1]]
 
         return dictionary
 
-    
-    def update_json(self, file_json: str, modified: bool):
-        with open(file_json, 'r') as f:
-            dict = json.load(f) 
-        
-        if modified:
-            for df in self.modified.values():
-                dict = self.find_combinations(self.data['inpsection_order'], df, dict)
-        else:
-            for input_file in self.input_files:
-                df = pd.read_csv(input_file)
-                dict = self.find_combinations(self.data['inpsection_order'], df, dict)
-
-        
-        with open(file_json, 'w') as f:
-            json.dump(dict, f)
-
-        return None
-    
-    def create_json(self, file_json: str=None):
+    def create_json(self, file_json: str = None):
         if not file_json:
-            input_files = [x.split('/')[-1].split('.')[0] for x in self.input_files]
+            input_files = [x.split('/')[-1].split('.')[0]
+                           for x in self.input_files]
             files = "_".join(input_files)
-            file_json = self.conf['tree_path']+'/'+files+'.json'
+            self.file_json = self.conf['tree_path']+'/'+files+'.json'
+            file_json = self.file_json
         # Create an empty dictionary
         data = {}
 
@@ -157,3 +140,23 @@ class setup_comparison:
             with open(file_json, 'w') as f:
                 json.dump(data, f)
 
+    def update_json(self, file_json: str=None, modified: bool=True):
+        if not file_json:
+            file_json = self.file_json
+        with open(file_json, 'r') as f:
+            dict = json.load(f)
+
+        if modified:
+            for df in self.modified.values():
+                dict = self.find_combinations(
+                    self.data['inpsection_order'], df, dict)
+        else:
+            for input_file in self.input_files:
+                df = pd.read_csv(input_file)
+                dict = self.find_combinations(
+                    self.data['inpsection_order'], df, dict)
+
+        with open(file_json, 'w') as f:
+            json.dump(dict, f)
+
+        return None

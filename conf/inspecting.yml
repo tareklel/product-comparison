@@ -12,7 +12,8 @@ data_config:
     ]
 portals: ["Farfetch", "Ounass"]
 input_path: "input/mini/"
+output_path: "output/"
 standard: "standard"
-dictionary_dir: "app/tests/resources/dictionary"
+dictionary_dir: "dictionary/"
 reference: "site"
 tree_path: "output/"
