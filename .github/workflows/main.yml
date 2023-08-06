@@ -27,4 +27,4 @@ jobs:
         export PYTHONPATH="${PYTHONPATH}:$(pwd)"
     - name: Run tests
       run: |
-        poetry run python app/tests/test_setup_comparison.py
+        poetry run python ./app/tests/test_setup_comparison.py
