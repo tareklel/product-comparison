@@ -127,8 +127,8 @@ class setup_comparison:
 
     def create_json(self, file_json: str = None):
         if not file_json:
-            input_files = [x.split('/')[-1].split('.')[0]
-                           for x in self.input_files]
+            input_files = sorted([x.split('/')[-1].split('.')[0]
+                           for x in self.input_files])
             files = "_".join(input_files)
             self.file_json = self.conf['tree_path']+'/'+files+'.json'
             file_json = self.file_json
