@@ -16,7 +16,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
-    - name: list directury
+    - name: list directory
       run: |
         ls & pwd
     - name: Install Poetry
@@ -27,7 +27,7 @@ jobs:
         poetry install
     - name: Set current directory as PYTHONPATH
       run: |
-        export PYTHONPATH="${PYTHONPATH}:$(pwd)/app"
+        echo "PYTHONPATH=$(pwd)/app" >> $GITHUB_ENV
     - name: Run tests
       run: |
         poetry run python app/tests/test_setup_comparison.py
