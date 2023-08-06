@@ -27,7 +27,7 @@ class TestSetupComparison(unittest.TestCase):
         self.test_obj.set_input_files()
 
         # Check if the CSV file paths list matches the expected list
-        self.assertEqual(self.test_obj.input_files, expected_csv_files)
+        self.assertEqual(sorted(self.test_obj.input_files), sorted(expected_csv_files))
 
     def test_map_df(self):
         """
