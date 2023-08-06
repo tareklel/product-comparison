@@ -1,0 +1,30 @@
+name: Python package
+
+on:
+  pull_request:
+    branches: 
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install Poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+    - name: Install dependencies
+      run: |
+        poetry install
+    - name: Set current directory as PYTHONPATH
+      run: |
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+    - name: Run tests
+      run: |
+        poetry run python app/tests/test_setup_comparison.py
