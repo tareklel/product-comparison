@@ -24,7 +24,7 @@ jobs:
         poetry install
     - name: Set current directory as PYTHONPATH
       run: |
-        export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)/app"
     - name: Run tests
       run: |
         poetry run python ./app/tests/test_setup_comparison.py
