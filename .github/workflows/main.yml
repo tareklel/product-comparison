@@ -27,7 +27,7 @@ jobs:
         poetry install
     - name: Set current directory as PYTHONPATH
       run: |
-        echo "PYTHONPATH=$(pwd)/app" >> $GITHUB_ENV
+        echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
     - name: Run tests
       run: |
         poetry run python app/tests/test_setup_comparison.py
