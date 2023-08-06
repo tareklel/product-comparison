@@ -1,0 +1,19 @@
+data_config:
+  inpsection_order:
+    [
+      "crawl_date",
+      "country",
+      "gender",
+      "brand",
+      "category",
+      "site",
+      "product_name",
+      "image_url"
+    ]
+portals: ["Farfetch", "Ounass"]
+input_path: "input/mini/"
+output_path: "output/"
+standard: "standard"
+dictionary_dir: "dictionary/"
+reference: "site"
+tree_path: "output/"

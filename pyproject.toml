@@ -7,8 +7,10 @@ authors = ["Tarik El Lel <tareklel@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.9"
 pandas = "^2.0.3"
+PyYAML = "^6.0"
 
 [tool.poetry.dev-dependencies]
+autopep8 = "^2.0.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
