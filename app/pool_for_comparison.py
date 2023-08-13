@@ -48,7 +48,19 @@ class pool_for_comparison:
         children_count = count_children(self.product_tree, 1, level)
         # get number of unpaired in each level
         grouping = get_grouping(children_count, self.pivot['pivot'])
-        return grouping
+        self.describe_unpaired = grouping
+
+    def fetch_unpaired_group(self, group_name):
+        self.get_unpaired()
+        data = self.product_tree
+        for key in group_name.split('.'):
+            data = data[key]
+        
+        group = {}
+        for key in data.keys():
+            group[key] = data[key][self.pivot['pivot_unique']]
+            
+        return group
     
 
 

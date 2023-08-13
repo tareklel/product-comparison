@@ -28,9 +28,14 @@ class TestSetupComparison(unittest.TestCase):
                                                                                                      'Ounass.product_name': 7},
                    'crawl_date.2023-06-18.country.sa.gender.women.brand.Burberry.category.shoes.site': {'Farfetch.product_name': 26,
                                                                                                         'Ounass.product_name': 9}}
-        display_unpaired = self.test_obj.get_unpaired()
-        self.assertEqual(display_unpaired, compare)
-
+        self.test_obj.get_unpaired()
+        self.assertEqual(self.test_obj.describe_unpaired, compare)
+    
+    def test_fetch_unpaired_group(self):
+        asserted_pair = self.test_obj.fetch_unpaired_group('crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site')
+        with open('app/tests/resources/json/test_fetch_unpaired_group.json') as f:
+            compare = json.load(f) 
+        self.assertEqual(asserted_pair, compare)
 
 if __name__ == '__main__':
     unittest.main()
