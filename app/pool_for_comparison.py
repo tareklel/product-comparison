@@ -2,6 +2,7 @@ import yaml
 import os
 import pandas as pd
 import json
+from app.helpers import get_keys_within_key, find_level, count_children, get_grouping
 
 
 class pool_for_comparison:
@@ -16,33 +17,11 @@ class pool_for_comparison:
         # pivot defines where the tree splits to reveal the dimensions we're trying to compare
         self.pivot = file['pivot']
 
-    def get_keys_within_key(self, d, target_key):
-        """
-        Get all keys within a specific key of a nested dictionary. 
-        This gathers keys from all instances of the target key across the tree.
-        
-        :param d: The nested dictionary.
-        :param target_key: The key within which to get the keys.
-        :return: A set of keys within the target key or an empty set if the key is not found.
-        """
-        # If the current object is not a dictionary, return an empty set.
-        if not isinstance(d, dict):
-            return set()
-        
-        # If the target key exists in the current dictionary, retrieve its keys.
-        keys = set(d[target_key].keys()) if target_key in d and isinstance(d[target_key], dict) else set()
-        
-        # Recurse deeper to find other instances of the target key and aggregate the results.
-        for key in d:
-            keys |= self.get_keys_within_key(d[key], target_key)
-        
-        return keys
-
     def create_pair_file(self):
         if not os.path.exists(self.pair_file):
 
             # create a column for each unique pivot
-            split_columns = self.get_keys_within_key(self.product_tree, self.pivot['pivot'])
+            split_columns = get_keys_within_key(self.product_tree, self.pivot['pivot'])
             split_columns = sorted([f"{x}_{self.pivot['pivot_unique']}" for x in split_columns])
             cols = self.schema[:self.schema.index(self.pivot['pivot'])]
             cols = cols + split_columns
@@ -50,5 +29,29 @@ class pool_for_comparison:
             df = pd.DataFrame({key: {} for key in cols})
             # write
             df.to_csv(self.pair_file, index=False)
+        # load pair file if it exists
+        if not hasattr(self, 'pair_df'):
+            self.pair_df = pd.read_csv(self.pair_file)
+        else:
+            print('pair file already exists and loaded')
+        
+    def load_pair_file(self):
+        if not self.pair_df:
+            self.pair_df = pd.read_csv(self.pair_file)
+        else:
+            print('pair file already exists and loaded')
+    
+    def get_unpaired(self):
+        # find tree level of product
+        level = find_level(self.product_tree, self.pivot['pivot'], 1) + 2
+        # get number of children
+        children_count = count_children(self.product_tree, 1, level)
+        # get number of unpaired in each level
+        grouping = get_grouping(children_count, self.pivot['pivot'])
+        return grouping
+    
 
-        self.pair_df = pd.read_csv(self.pair_file)
+
+    
+    
+
