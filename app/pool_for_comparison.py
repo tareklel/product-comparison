@@ -79,22 +79,55 @@ class ComparePool:
     def __init__(self, group, group_name):
         self.group = group
         self.group_name = group_name
+        self.matched = []
 
     def select_compare_a(self):
-        compare_a_key = list(self.group.keys())[0]
-        if len(self.group[compare_a_key]) > 0:
-            product_a_key = list(self.group[compare_a_key].keys())[0]
-            self.compare_a = {product_a_key: self.group[compare_a_key][product_a_key]}
-        else: 
-            print('no more keys to compare in first group')
-    
+        """
+        Selects an item from the first key in the group dictionary 
+        and assigns it to the compare_a attribute.
+        """
+        if not self.group:
+            print('The group is empty.')
+            return
+
+        first_group_key = list(self.group.keys())[0]
+        first_group_values = self.group[first_group_key]
+
+        if first_group_values:
+            product_a_key = next(iter(first_group_values))
+            self.compare_a = {product_a_key: first_group_values[product_a_key]}
+        else:
+            print('No more keys to compare in the first group.')
+            
     def select_compare_b(self):
         compare_b_key = list(self.group.keys())[1]
         if len(self.group[compare_b_key]) > 0:
             self.product_b_list = self.group[compare_b_key]
-        else: 
+        else:
             print('no more keys to compare in first group')
-    
 
+    def select_match(self, product_name):
+        """
+        If the product_name exists in product_b_list, pop the value and 
+        a value from compare_a, then append both to the matched list.
+        """
+        # Check for product_name in product_b_list
+        if product_name not in self.product_b_list:
+            print('Object not found in list')
+            return
 
+        # Extract the first and second keys of the group
+        group_keys = list(self.group.keys())
+        first_group_key, second_group_key = group_keys[0], group_keys[1] if len(group_keys) > 1 else None
 
+        # Pop the corresponding values
+        key_from_compare_a = next(iter(self.compare_a))
+        value_from_compare_a = self.compare_a.pop(key_from_compare_a)
+        value_from_product_b_list = self.product_b_list.pop(product_name)
+
+        # Construct the matched item and append to the matched list
+        matched_item = {
+            first_group_key: {key_from_compare_a: value_from_compare_a},
+            second_group_key: {product_name: value_from_product_b_list}
+        }
+        self.matched.append(matched_item)
