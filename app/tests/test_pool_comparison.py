@@ -51,6 +51,18 @@ class TestSetupComparison(unittest.TestCase):
             }}
         self.assertEqual(self.test_compare.compare_a, to_assert)
 
+    def rest_select_compare_b(self):
+        self.test_compare.select_compare_b()
+        to_assert = {
+            "Kenzoschool Boke Flower Slip-on Sneakers in Canvas": {
+                "text": "An iconic sneaker that evokes the designer's Japanese heritage with a signature boke flower that decorates the upper proudly. Crafted from canvas, the slip-on silhouette are topped with elasticated sides which make them easy to put on and slide off,. "
+            },
+            "Kenzoschool High-top Sneakers in Canvas": {
+                "text": "Kenzo's high-top sneakers reference retro-skate culture. Crafted in Thailand, the sneakers are set on a graphic rubber sole and have a canvas upper with BOKE FLOWER embroidery and a military-inspired tag engraved with the address of Kenzo's Paris headquarters."
+            }
+        }
+        self.assertEqual(self.test_compare_b.product_b_list, to_assert)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -85,5 +85,16 @@ class ComparePool:
         if len(self.group[compare_a_key]) > 0:
             product_a_key = list(self.group[compare_a_key].keys())[0]
             self.compare_a = {product_a_key: self.group[compare_a_key][product_a_key]}
+        else: 
+            print('no more keys to compare in first group')
+    
+    def select_compare_b(self):
+        compare_b_key = list(self.group.keys())[1]
+        if len(self.group[compare_b_key]) > 0:
+            self.product_b_list = self.group[compare_b_key]
+        else: 
+            print('no more keys to compare in first group')
+    
+
 
 
