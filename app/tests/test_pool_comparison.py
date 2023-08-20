@@ -4,6 +4,8 @@ import unittest
 import pandas as pd
 from pandas.testing import assert_frame_equal
 import json
+import io
+import sys
 
 
 class TestSetupComparison(unittest.TestCase):
@@ -64,10 +66,17 @@ class TestSetupComparison(unittest.TestCase):
         self.assertEqual(self.test_compare.product_b_list, to_assert)
 
     def test_select_match(self):
+        # Select the first comparison group for testing
         self.test_compare.select_compare_a()
+
+        # Select the second comparison group for testing
         self.test_compare.select_compare_b()
+
+        # Perform a match for the specified product name
         self.test_compare.select_match(
             'Kenzoschool Boke Flower Slip-on Sneakers in Canvas')
+
+        # Define the expected matched output
         test = [{'Farfetch': {
             "panelled-design sneakers": {
                 "text": "['panelled-design sneakers', 'FARFETCH ID: ', 'Brand style ID: ']"
@@ -75,21 +84,77 @@ class TestSetupComparison(unittest.TestCase):
             "Kenzoschool Boke Flower Slip-on Sneakers in Canvas": {
                 "text": "An iconic sneaker that evokes the designer's Japanese heritage with a signature boke flower that decorates the upper proudly. Crafted from canvas, the slip-on silhouette are topped with elasticated sides which make them easy to put on and slide off,. "
             }}}]
+
+        # Assert that the matching is as expected
         self.assertEqual(self.test_compare.matched, test)
 
-        # test if dict had index popped
+        # Define the expected dictionary after a product has been removed
         reduced_test = {"Kenzoschool High-top Sneakers in Canvas": {
             "text": "Kenzo's high-top sneakers reference retro-skate culture. Crafted in Thailand, the sneakers are set on a graphic rubber sole and have a canvas upper with BOKE FLOWER embroidery and a military-inspired tag engraved with the address of Kenzo's Paris headquarters."
         }}
+
+        # Check if the dictionary has been reduced as expected
         self.assertEqual(self.test_compare.product_b_list, reduced_test)
 
+        # Define the expected state of the first comparison group after matching
         self.assertEqual(self.test_compare.compare_a, {"Kenzoschool high-top sneakers": {
             "text": "['Kenzoschool high-top sneakers', \"Balancing exuberant detailing with streetwear comfort, these high-top sneakers work to capture Kenzo's fun-loving aesthetic. Ridged rubber detailing completes the design, while the brand's signature embroidered Boke Flower motif lends a playful feel.\", 'FARFETCH ID: ', 'Brand style ID: ']"
         }})
 
+        # Confirm the state of the second comparison group remains consistent
         self.assertEqual(self.test_compare.product_b_list, {"Kenzoschool High-top Sneakers in Canvas": {
-                "text": "Kenzo's high-top sneakers reference retro-skate culture. Crafted in Thailand, the sneakers are set on a graphic rubber sole and have a canvas upper with BOKE FLOWER embroidery and a military-inspired tag engraved with the address of Kenzo's Paris headquarters."
-            }})
+            "text": "Kenzo's high-top sneakers reference retro-skate culture. Crafted in Thailand, the sneakers are set on a graphic rubber sole and have a canvas upper with BOKE FLOWER embroidery and a military-inspired tag engraved with the address of Kenzo's Paris headquarters."
+        }})
+
+        # Redirect stdout to a buffer to capture printed output
+        buffer = io.StringIO()
+        sys.stdout = buffer
+
+        # Attempt another match which should result in no more keys
+        self.test_compare.select_match(
+            'Kenzoschool High-top Sneakers in Canvas')
+
+        # Assert that the printed message matches our expectation
+        self.assertEqual(buffer.getvalue(),
+                         'No more keys to compare in the first group.\n')
+
+    def test_return_pairs(self):
+        # Select the first comparison group for testing
+        self.test_compare.select_compare_a()
+
+        # Select the second comparison group for testing
+        self.test_compare.select_compare_b()
+
+        # Perform a match for the specified product name
+        self.test_compare.select_match(
+            'Kenzoschool Boke Flower Slip-on Sneakers in Canvas')
+
+        with open('app/tests/resources/json/test_return_pairs.json') as f:
+            compare = json.load(f)
+
+        matched = self.test_compare.return_pairs()
+        self.assertEqual(matched, compare)
+
+    def test_select_next_a(self):
+        self.test_compare.select_compare_a()
+        self.test_compare.select_next_a()
+
+        test = {
+            "Kenzoschool high-top sneakers": {
+                "text": "['Kenzoschool high-top sneakers', \"Balancing exuberant detailing with streetwear comfort, these high-top sneakers work to capture Kenzo's fun-loving aesthetic. Ridged rubber detailing completes the design, while the brand's signature embroidered Boke Flower motif lends a playful feel.\", 'FARFETCH ID: ', 'Brand style ID: ']"
+            }
+        }
+
+        self.assertEqual(self.test_compare.compare_a, test)
+
+        self.test_compare.select_next_a()
+
+        test2 = {
+                "panelled-design sneakers": {
+                    "text": "['panelled-design sneakers', 'FARFETCH ID: ', 'Brand style ID: ']"
+                }
+            }
+        self.assertEqual(self.test_compare.compare_a, test2)
 
 
 if __name__ == '__main__':

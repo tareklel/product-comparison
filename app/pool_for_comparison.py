@@ -79,6 +79,10 @@ class ComparePool:
     def __init__(self, group, group_name):
         self.group = group
         self.group_name = group_name
+        # Extract the first and second keys of the group
+        group_keys = list(self.group.keys())
+        self.first_group_key, self.second_group_key = group_keys[0], group_keys[1] if len(
+            group_keys) > 1 else None
         self.matched = []
 
     def select_compare_a(self):
@@ -90,21 +94,36 @@ class ComparePool:
             print('The group is empty.')
             return
 
-        first_group_key = list(self.group.keys())[0]
-        first_group_values = self.group[first_group_key]
+        first_group_values = self.group[self.first_group_key]
 
         if first_group_values:
             product_a_key = next(iter(first_group_values))
             self.compare_a = {product_a_key: first_group_values[product_a_key]}
         else:
             print('No more keys to compare in the first group.')
-            
+
     def select_compare_b(self):
-        compare_b_key = list(self.group.keys())[1]
-        if len(self.group[compare_b_key]) > 0:
-            self.product_b_list = self.group[compare_b_key]
+        if len(self.group[self.second_group_key]) > 0:
+            self.product_b_list = self.group[self.second_group_key]
         else:
-            print('no more keys to compare in first group')
+            print('No more keys to compare in the first group.')
+
+    def select_next_a(self):
+        if len(self.group[self.first_group_key]) <= 1:
+            print('None to select next')
+        else:
+            first_group = self.group[self.first_group_key]
+            keys = list(first_group.keys())
+            start_key = list(self.compare_a.keys())[0]
+            start_index = keys.index(start_key)
+            max_index = len(keys) - 1 if keys else None
+            if start_index == max_index:
+                product_a_key = next(iter(first_group))
+            else:
+                product_a_key = keys[start_index + 1]
+            
+            self.compare_a = {product_a_key: first_group[product_a_key]}
+            
 
     def select_match(self, product_name):
         """
@@ -116,20 +135,24 @@ class ComparePool:
             print('Object not found in list')
             return
 
-        # Extract the first and second keys of the group
-        group_keys = list(self.group.keys())
-        first_group_key, second_group_key = group_keys[0], group_keys[1] if len(group_keys) > 1 else None
-
         # Pop the corresponding values
         key_from_compare_a = next(iter(self.compare_a))
-        value_from_compare_a = self.group[first_group_key].pop(key_from_compare_a)
+        value_from_compare_a = self.group[self.first_group_key].pop(
+            key_from_compare_a)
         value_from_product_b_list = self.product_b_list.pop(product_name)
 
         # Construct the matched item and append to the matched list
         matched_item = {
-            first_group_key: {key_from_compare_a: value_from_compare_a},
-            second_group_key: {product_name: value_from_product_b_list}
+            self.first_group_key: {key_from_compare_a: value_from_compare_a},
+            self.second_group_key: {product_name: value_from_product_b_list}
         }
         self.matched.append(matched_item)
 
         self.select_compare_a()
+
+    def return_pairs(self):
+        unmatched = {self.first_group_key: self.group[self.first_group_key],
+                     self.second_group_key: self.group[self.second_group_key]}
+
+        return {'matched': self.matched, 'unmatched': unmatched}
+    
