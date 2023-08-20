@@ -83,6 +83,14 @@ class TestSetupComparison(unittest.TestCase):
         }}
         self.assertEqual(self.test_compare.product_b_list, reduced_test)
 
+        self.assertEqual(self.test_compare.compare_a, {"Kenzoschool high-top sneakers": {
+            "text": "['Kenzoschool high-top sneakers', \"Balancing exuberant detailing with streetwear comfort, these high-top sneakers work to capture Kenzo's fun-loving aesthetic. Ridged rubber detailing completes the design, while the brand's signature embroidered Boke Flower motif lends a playful feel.\", 'FARFETCH ID: ', 'Brand style ID: ']"
+        }})
+
+        self.assertEqual(self.test_compare.product_b_list, {"Kenzoschool High-top Sneakers in Canvas": {
+                "text": "Kenzo's high-top sneakers reference retro-skate culture. Crafted in Thailand, the sneakers are set on a graphic rubber sole and have a canvas upper with BOKE FLOWER embroidery and a military-inspired tag engraved with the address of Kenzo's Paris headquarters."
+            }})
+
 
 if __name__ == '__main__':
     unittest.main()

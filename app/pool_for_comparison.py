@@ -122,7 +122,7 @@ class ComparePool:
 
         # Pop the corresponding values
         key_from_compare_a = next(iter(self.compare_a))
-        value_from_compare_a = self.compare_a.pop(key_from_compare_a)
+        value_from_compare_a = self.group[first_group_key].pop(key_from_compare_a)
         value_from_product_b_list = self.product_b_list.pop(product_name)
 
         # Construct the matched item and append to the matched list
@@ -131,3 +131,5 @@ class ComparePool:
             second_group_key: {product_name: value_from_product_b_list}
         }
         self.matched.append(matched_item)
+
+        self.select_compare_a()
