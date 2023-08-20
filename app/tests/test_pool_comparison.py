@@ -159,8 +159,14 @@ class TestSetupComparison(unittest.TestCase):
     def test_select_group_name(self):
 
         self.test_obj.select_group_name()
-        self.assertEqual(self.test_obj.selected_group_name,
-                        'crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site')
+        self.assertEqual(self.test_obj.group_name_selected,
+                         'crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site')
+
+    def test_select_group_name(self):
+        self.test_obj.select_group_name()
+        self.test_obj.select_next_group_name()
+        self.assertEqual(self.test_obj.group_name_selected, 'crawl_date.2023-06-18.country.sa.gender.women.brand.Burberry.category.shoes.site'
+                         )
 
 
 if __name__ == '__main__':

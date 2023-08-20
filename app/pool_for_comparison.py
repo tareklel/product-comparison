@@ -51,9 +51,8 @@ class ComparePool:
                 product_a_key = next(iter(first_group))
             else:
                 product_a_key = keys[start_index + 1]
-            
+
             self.compare_a = {product_a_key: first_group[product_a_key]}
-            
 
     def select_match(self, product_name):
         """
@@ -155,18 +154,32 @@ class PoolForComparison:
 
         # Return the constructed group
         return group
-    
-    # select group_name
+
     # cycle through group_names
 
     def select_group_name(self):
         self.get_unpaired()
         if len(list(self.describe_unpaired.keys())) > 0:
-            self.selected_group_name = list(self.describe_unpaired.keys())[0]
+            self.group_name_selected = list(self.describe_unpaired.keys())[0]
+        else:
+            print('No more unpaired')
+    
+    def select_next_group_name(self):
+        if len(list(self.describe_unpaired.keys())) <= 1 or self.group_name_selected is None:
+            self.select_group_name()
+        else:
+            keys = list(self.describe_unpaired.keys())
+            start_key = self.group_name_selected
+            start_index = keys.index(start_key)
+            max_index = len(keys) - 1 if keys else None
+            if start_index == max_index:
+                selected = next(iter(self.describe_unpaired))
+            else:
+                selected = keys[start_index + 1]
+
+            self.group_name_selected = selected
+
 
     def start_compare_pool(self, group_name):
         group = self.fetch_unpaired_group(group_name)
         self.comparepool = ComparePool(group, group_name)
-
-
-
