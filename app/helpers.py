@@ -88,4 +88,4 @@ def get_grouping(children, divider):
         # Remove processed keys from the children dictionary
         [children.pop(x) for x in to_pop]
 
-    return compared
+    return {k: compared[k] for k in sorted(compared)}

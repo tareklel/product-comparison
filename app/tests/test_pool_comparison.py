@@ -15,6 +15,12 @@ class TestSetupComparison(unittest.TestCase):
 
         with open('app/tests/resources/json/test_fetch_unpaired_group_mini.json') as f:
             compare = json.load(f)
+    
+        try:
+            os.remove(
+                'app/tests/resources/output/farfetch_mini_ounass_mini_match.csv')
+        except FileNotFoundError:
+            pass
 
         self.test_compare = ComparePool(
             compare, 'crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site')
@@ -129,17 +135,14 @@ class TestSetupComparison(unittest.TestCase):
             }
         }
         self.assertEqual(self.test_compare.compare_a, test2)
+    
+    # TEST PoolForComparison
 
     def test_create_pair_file(self):
         test_df = pd.read_csv(
             'app/tests/resources/compare/farfetch_mini_ounass_mini_match.csv')
         self.test_obj.create_pair_file()
         assert_frame_equal(self.test_obj.pair_df, test_df, check_dtype=False)
-        try:
-            os.remove(
-                'app/tests/resources/output/farfetch_mini_ounass_mini_match.csv')
-        except FileNotFoundError:
-            pass
 
     def test_get_unpaired(self):
         compare = {'crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site': {'Farfetch.product_name': 33,
@@ -165,8 +168,40 @@ class TestSetupComparison(unittest.TestCase):
     def test_select_group_name(self):
         self.test_obj.select_group_name()
         self.test_obj.select_next_group_name()
-        self.assertEqual(self.test_obj.group_name_selected, 'crawl_date.2023-06-18.country.sa.gender.women.brand.Burberry.category.shoes.site'
+        self.assertEqual(self.test_obj.group_name_selected, 'crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site'
                          )
+        self.test_obj.select_next_group_name()
+        self.assertEqual(self.test_obj.group_name_selected,
+                         'crawl_date.2023-06-18.country.sa.gender.women.brand.Burberry.category.shoes.site')
+        
+    def test_set_up_matched(self):
+        self.test_obj.set_up_matched()
+        df = pd.DataFrame(columns=self.test_obj.schema)
+        assert_frame_equal(self.test_obj.matched_df, df)
+        pd.DataFrame(columns=['b']).to_csv(self.test_obj.pair_file)
+        del self.test_obj.matched_df
+        with self.assertRaises(ValueError) as context:
+            self.test_obj.set_up_matched()
+        
+        self.assertEqual(str(context.exception), 'Schema and file columns do not match')
+        
+
+
+
+    def test_consolidated_matched(self):
+        self.test_obj.pair_file = 'app/tests/resources/compare/test_consolidate_matched.csv'
+        self.test_obj.comparepool = self.test_compare
+        self.test_obj.comparepool.select_compare_a()
+        self.test_obj.comparepool.select_compare_b()
+        self.test_obj.comparepool.select_match(
+            'Kenzoschool Boke Flower Slip-on Sneakers in Canvas')
+        self.test_obj.consolidate_matched()
+        # we need to check if pair_file is updated
+        df = pd.read_csv('app/tests/resources/compare/test_consolidate_matched.csv')
+        self.test_obj.consolidated_matched()
+        assert_frame_equal(self.test_obj.matched_df, df)
+        
+        
 
 
 if __name__ == '__main__':

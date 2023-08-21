@@ -155,20 +155,18 @@ class PoolForComparison:
         # Return the constructed group
         return group
 
-    # cycle through group_names
-
     def select_group_name(self):
         self.get_unpaired()
         if len(list(self.describe_unpaired.keys())) > 0:
-            self.group_name_selected = list(self.describe_unpaired.keys())[0]
+            self.group_name_selected = sorted(list(self.describe_unpaired.keys()))[0]
         else:
             print('No more unpaired')
-    
+
     def select_next_group_name(self):
         if len(list(self.describe_unpaired.keys())) <= 1 or self.group_name_selected is None:
             self.select_group_name()
         else:
-            keys = list(self.describe_unpaired.keys())
+            keys = sorted(list(self.describe_unpaired.keys()))
             start_key = self.group_name_selected
             start_index = keys.index(start_key)
             max_index = len(keys) - 1 if keys else None
@@ -179,7 +177,29 @@ class PoolForComparison:
 
             self.group_name_selected = selected
 
-
     def start_compare_pool(self, group_name):
         group = self.fetch_unpaired_group(group_name)
         self.comparepool = ComparePool(group, group_name)
+
+    def get_matched_from_pool(self):
+        return self.comparepool.return_pairs()
+
+    def set_up_matched(self):
+        if os.path.exists(self.pair_file):
+            self.matched_df = pd.read_csv(self.pair_file)
+            if sorted(list(self.matched_df.columns)) != sorted(self.schema):
+                raise ValueError('Schema and file columns do not match')
+
+        else:
+            self.matched_df = pd.DataFrame(columns=self.schema)    
+    
+#    def update_matched(self):
+#        matched = self.get_matched_from_pool()
+        
+
+    def consolidate_matched(self):
+        # update matched sheet
+        # 
+        matched_from_pool = self.get_matched_from_pool()
+
+
