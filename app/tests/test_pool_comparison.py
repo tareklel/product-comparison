@@ -184,12 +184,22 @@ class TestSetupComparison(unittest.TestCase):
             self.test_obj.set_up_matched()
         
         self.assertEqual(str(context.exception), 'Schema and file columns do not match')
-        
 
-
+    def test_update_matched(self):
+        self.test_obj.set_up_matched()
+        self.test_obj.comparepool = self.test_compare
+        self.test_obj.comparepool.select_compare_a()
+        self.test_obj.comparepool.select_compare_b()
+        self.test_obj.comparepool.select_match(
+            'Kenzoschool Boke Flower Slip-on Sneakers in Canvas')
+        self.test_obj.update_matched()
+        with open('app/tests/resources/json/test_return_pairs.json') as f:
+            d = json.load(f)
+        compare = {'crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site' : d}
+        self.assertEqual(self.test_obj.matched, [compare])
 
     def test_consolidated_matched(self):
-        self.test_obj.pair_file = 'app/tests/resources/compare/test_consolidate_matched.csv'
+        self.test_obj.pair_file = 'app/tests/resources/compare/farfetch_mini_ounass_mini_match.csv'
         self.test_obj.comparepool = self.test_compare
         self.test_obj.comparepool.select_compare_a()
         self.test_obj.comparepool.select_compare_b()
@@ -206,3 +216,9 @@ class TestSetupComparison(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+    
+    try:
+        os.remove(
+            'app/tests/resources/output/farfetch_mini_ounass_mini_match.csv')
+    except FileNotFoundError:
+        pass

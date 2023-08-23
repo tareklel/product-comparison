@@ -187,19 +187,25 @@ class PoolForComparison:
     def set_up_matched(self):
         if os.path.exists(self.pair_file):
             self.matched_df = pd.read_csv(self.pair_file)
+            self.matched = []
             if sorted(list(self.matched_df.columns)) != sorted(self.schema):
                 raise ValueError('Schema and file columns do not match')
 
         else:
+            self.matched = []
             self.matched_df = pd.DataFrame(columns=self.schema)    
     
-#    def update_matched(self):
-#        matched = self.get_matched_from_pool()
-        
+    def update_matched(self):
+        matched = self.get_matched_from_pool()
+        if matched not in self.matched:
+            matched = {self.comparepool.group_name:matched}
+            self.matched.append(matched)
 
     def consolidate_matched(self):
-        # update matched sheet
-        # 
-        matched_from_pool = self.get_matched_from_pool()
+        for match in self.matched:
+            None
 
+
+
+        
 
