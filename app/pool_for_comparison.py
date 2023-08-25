@@ -2,6 +2,7 @@ import yaml
 import os
 import pandas as pd
 import json
+import numpy as np
 from app.helpers import get_keys_within_key, find_level, count_children, get_grouping
 
 
@@ -99,16 +100,20 @@ class PoolForComparison:
         # pivot defines where the tree splits to reveal the dimensions we're trying to compare
         self.pivot = file['pivot']
 
+        # get the pivot columns for comparing pairs
+        self.identifiers = sorted(list(get_keys_within_key(
+                self.product_tree, self.pivot['pivot'])))
+        self.split_columns = sorted(
+            [f"{x}_{self.pivot['pivot_unique']}" for x in self.identifiers])
+        
+        
+
     def create_pair_file(self):
         if not os.path.exists(self.pair_file):
 
             # create a column for each unique pivot
-            split_columns = get_keys_within_key(
-                self.product_tree, self.pivot['pivot'])
-            split_columns = sorted(
-                [f"{x}_{self.pivot['pivot_unique']}" for x in split_columns])
             cols = self.schema[:self.schema.index(self.pivot['pivot'])]
-            cols = cols + split_columns
+            cols = cols + self.split_columns
             # create dataframe
             df = pd.DataFrame({key: {} for key in cols})
             # write
@@ -188,9 +193,6 @@ class PoolForComparison:
         if os.path.exists(self.pair_file):
             self.matched_df = pd.read_csv(self.pair_file)
             self.matched = []
-            if sorted(list(self.matched_df.columns)) != sorted(self.schema):
-                raise ValueError('Schema and file columns do not match')
-
         else:
             self.matched = []
             self.matched_df = pd.DataFrame(columns=self.schema)    
@@ -201,8 +203,43 @@ class PoolForComparison:
             matched = {self.comparepool.group_name:matched}
             self.matched.append(matched)
 
+    def rework_to_pair_file(self, match_dict: list):
+        # given match output from ComparePool reformat to add to match file
+        'crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site'
+        match_name =list(match_dict.keys())[0]
+        split = match_name.split('.')
+        # get values
+        values = [item for index, item in enumerate(split[:-1]) if index % 2 != 0]
+        reworked = []
+        # add matched self.split_columns
+        for match in match_dict[match_name]['matched']:
+            col = values + [list(match[self.identifiers[0]].keys())[0], 
+            list(match[self.identifiers[1]].keys())[0]]
+            reworked.append(col)
+        unmatched1 = list(match_dict[match_name]['unmatched'][self.identifiers[0]].keys())
+        [reworked.append(values + [x] + [np.nan]) for x in unmatched1]
+        unmatched2 = list(match_dict[match_name]['unmatched'][self.identifiers[1]].keys())
+        [reworked.append(values + [np.nan] + [x]) for x in unmatched2]
+
+        return pd.DataFrame(reworked, columns=self.pair_df.columns)
+
     def consolidate_matched(self):
         for match in self.matched:
+            # rework pair file entries from group name
+            reworked = self.rework_to_pair_file(match)
+            # add matched and unmatched
+            for index, row in reworked.iterrows():
+                # if matched
+                if row[self.split_columns[0]] and row[self.split_columns[1]]:
+                    None
+            # if match is there dont do anything
+            # if match exists differently update
+            # if no match add
+            # for unmatched
+            # if matched is there don't do anything
+            # if matched isn't there add
+            # if unmatched exists don't do anything
+            # remove all matched from
             None
 
 
