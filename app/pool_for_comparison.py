@@ -252,3 +252,5 @@ class PoolForComparison:
 
     def save_pair_df(self):
         self.pair_df.to_csv(self.pair_file, index=False)
+    
+    # next steps tkinter mayhaps
