@@ -8,7 +8,7 @@ data_config:
       "category",
       "site",
       "product_name",
-      "image_url"
+      "text"
     ]
 portals: ["Farfetch", "Ounass"]
 input_path: "input/mini/"
