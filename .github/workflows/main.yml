@@ -28,6 +28,9 @@ jobs:
     - name: Set current directory as PYTHONPATH
       run: |
         echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
-    - name: Run tests
+    - name: Run set_comparison tests
       run: |
         poetry run python app/tests/test_setup_comparison.py
+    - name: Run pool comparison tests
+      run: |
+        poetry run python app/tests/test_pool_comparison.py
