@@ -188,9 +188,8 @@ class TestSetupComparison(unittest.TestCase):
         self.test_obj.comparepool.select_match(
             'Kenzoschool Boke Flower Slip-on Sneakers in Canvas')
         self.test_obj.update_matched()
-        with open('app/tests/resources/json/test_return_pairs.json') as f:
-            d = json.load(f)
-        compare = {'crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site' : d}
+        with open('app/tests/resources/json/test_update_matched.json') as f:
+            compare = json.load(f)
         self.assertEqual(self.test_obj.matched, [compare])
 
     def test_rework_to_pair_file(self):
@@ -198,9 +197,8 @@ class TestSetupComparison(unittest.TestCase):
         self.test_create_pair_file()
         self.test_obj.set_up_matched()
         # use read matched dictionary
-        with open('app/tests/resources/json/test_return_pairs.json') as f:
-            d = json.load(f)
-        full = {'crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site' : d}
+        with open('app/tests/resources/json/test_update_matched.json') as f:
+            full = json.load(f)
         reworked = self.test_obj.rework_to_pair_file(full)
         compare = pd.read_csv('app/tests/resources/compare/test_rework_to_pair.csv')
         assert_frame_equal(reworked, compare)
@@ -208,21 +206,32 @@ class TestSetupComparison(unittest.TestCase):
 
 
     def test_consolidated_matched(self):
-        self.test_obj.pair_file = 'app/tests/resources/compare/farfetch_mini_ounass_mini_match.csv'
-        self.test_obj.set_up_matched()
-        self.test_obj.comparepool = self.test_compare
-        self.test_obj.comparepool.select_compare_a()
-        self.test_obj.comparepool.select_compare_b()
-        self.test_obj.comparepool.select_match(
-            'Kenzoschool Boke Flower Slip-on Sneakers in Canvas')
-        self.test_obj.consolidate_matched()
-        # we need to check if pair_file is updated
         df = pd.read_csv('app/tests/resources/compare/test_consolidate_matched.csv')
-        self.test_obj.consolidated_matched()
-        # assert_frame_equal(self.test_obj.matched_df, df)
-        
-        
+        # check when passing mathced pair to df with the pairs unmatched
+        self.test_obj.pair_df = df.iloc[1:]
+        with open('app/tests/resources/json/test_consolidate_matched.json') as f:
+            d = json.load(f)
+        self.test_obj.matched = [d['scenario_1']]
+        self.test_obj.consolidate_matched()
+        assert_frame_equal(self.test_obj.pair_df, df.iloc[:1])
 
+        # check when matched pair introduced and matched already in 
+        self.test_obj.pair_df = df.iloc[:1]
+        self.test_obj.matched = [d['scenario_1']]
+        self.test_obj.consolidate_matched()
+        assert_frame_equal(self.test_obj.pair_df, df.iloc[:1])
+
+        #check when unmatched introduced to matched pair
+        self.test_obj.pair_df = df.iloc[1:]
+        self.test_obj.matched = [d['scenario_2']]
+        self.test_obj.consolidate_matched()
+        assert_frame_equal(self.test_obj.pair_df, df.iloc[1:].reset_index(drop=True))
+
+        # check when unmatched introduced to unmatched different
+        self.test_obj.pair_df = df.iloc[1:2].reset_index(drop=True)
+        self.test_obj.matched = [d['scenario_2']]
+        self.test_obj.consolidate_matched()
+        assert_frame_equal(self.test_obj.pair_df, df.iloc[1:].reset_index(drop=True))
 
 if __name__ == '__main__':
     unittest.main()
