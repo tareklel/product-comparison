@@ -249,3 +249,6 @@ class PoolForComparison:
             keep='first').reset_index(drop=True)
         # reset matched to blank
         self.matched = []
+
+    def save_pair_df(self):
+        self.pair_df.to_csv(self.pair_file, index=False)
