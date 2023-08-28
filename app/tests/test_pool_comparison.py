@@ -96,7 +96,7 @@ class TestSetupComparison(unittest.TestCase):
 
         # Assert that the printed message matches our expectation
         self.assertEqual(buffer.getvalue(),
-                         'No more keys to compare in the first group.\n')
+                         f'No more keys to compare in the first group.\n')
 
     def test_return_pairs(self):
         # Select the first comparison group for testing

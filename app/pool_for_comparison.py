@@ -10,80 +10,76 @@ class ComparePool:
     def __init__(self, group, group_name):
         self.group = group
         self.group_name = group_name
-        # Extract the first and second keys of the group
-        group_keys = list(self.group.keys())
-        self.first_group_key, self.second_group_key = group_keys[0], group_keys[1] if len(
-            group_keys) > 1 else None
+        self.initialize_keys()
         self.matched = []
 
+    def initialize_keys(self):
+        """Initialize the first and second keys from the group dictionary."""
+        group_keys = list(self.group.keys())
+        self.first_group_key = group_keys[0]
+        self.second_group_key = group_keys[1] if len(group_keys) > 1 else None
+
     def select_compare_a(self):
-        """
-        Selects an item from the first key in the group dictionary 
-        and assigns it to the compare_a attribute.
-        """
-        if not self.group:
-            print('The group is empty.')
+        """Select an item from the first key and store it in compare_a attribute."""
+        self.select_item_for_comparison(self.first_group_key, 'compare_a')
+
+    def select_item_for_comparison(self, key_name, attr_name):
+        """Helper method to select an item for comparison."""
+        if not self.group or not self.group[key_name]:
+            print(f'No more keys to compare in the first group.')
             return
-
-        first_group_values = self.group[self.first_group_key]
-
-        if first_group_values:
-            product_a_key = next(iter(first_group_values))
-            self.compare_a = {product_a_key: first_group_values[product_a_key]}
-        else:
-            print('No more keys to compare in the first group.')
+        item_key = next(iter(self.group[key_name]))
+        setattr(self, attr_name, {item_key: self.group[key_name][item_key]})
 
     def select_compare_b(self):
-        if len(self.group[self.second_group_key]) > 0:
-            self.product_b_list = self.group[self.second_group_key]
-        else:
-            print('No more keys to compare in the first group.')
+        """Select items from the second key and store them in product_b_list attribute."""
+        self.product_b_list = self.group[self.second_group_key] if self.group[self.second_group_key] else None
 
     def select_next_a(self):
-        if len(self.group[self.first_group_key]) <= 1:
-            print('None to select next')
-        else:
-            first_group = self.group[self.first_group_key]
-            keys = list(first_group.keys())
-            start_key = list(self.compare_a.keys())[0]
-            start_index = keys.index(start_key)
-            max_index = len(keys) - 1 if keys else None
-            if start_index == max_index:
-                product_a_key = next(iter(first_group))
-            else:
-                product_a_key = keys[start_index + 1]
+        """Select the next item in the first group for comparison."""
+        self.select_next_item_for_comparison(self.first_group_key, 'compare_a')
 
-            self.compare_a = {product_a_key: first_group[product_a_key]}
+    def select_next_item_for_comparison(self, key_name, attr_name):
+        """Helper method to select the next item for comparison."""
+        if not self.group[key_name] or len(self.group[key_name]) <= 1:
+            print('None to select next')
+            return
+
+        keys = list(self.group[key_name].keys())
+        start_key = list(getattr(self, attr_name).keys())[0]
+        start_index = keys.index(start_key)
+
+        # Get the next key
+        next_key = keys[(start_index + 1) % len(keys)]
+        setattr(self, attr_name, {next_key: self.group[key_name][next_key]})
 
     def select_match(self, product_name):
-        """
-        If the product_name exists in product_b_list, pop the value and 
-        a value from compare_a, then append both to the matched list.
-        """
-        # Check for product_name in product_b_list
+        """Identify and store matched items."""
         if product_name not in self.product_b_list:
             print('Object not found in list')
             return
+        self.store_matched_item(product_name)
 
-        # Pop the corresponding values
+    def store_matched_item(self, product_name):
+        """Helper method to store matched items."""
         key_from_compare_a = next(iter(self.compare_a))
         value_from_compare_a = self.group[self.first_group_key].pop(
             key_from_compare_a)
         value_from_product_b_list = self.product_b_list.pop(product_name)
 
-        # Construct the matched item and append to the matched list
         matched_item = {
             self.first_group_key: {key_from_compare_a: value_from_compare_a},
             self.second_group_key: {product_name: value_from_product_b_list}
         }
         self.matched.append(matched_item)
 
+        # Select the next 'a' for further comparison
         self.select_compare_a()
 
     def return_pairs(self):
+        """Return both matched and unmatched items."""
         unmatched = {self.first_group_key: self.group[self.first_group_key],
                      self.second_group_key: self.group[self.second_group_key]}
-
         return {'matched': self.matched, 'unmatched': unmatched}
 
 
@@ -107,6 +103,7 @@ class PoolForComparison:
             [f"{x}_{self.pivot['pivot_unique']}" for x in self.identifiers])
 
     def create_pair_file(self):
+        """ Create a CSV file to store product pairings if it doesn't exist """
         if not os.path.exists(self.pair_file):
 
             # create a column for each unique pivot
@@ -129,6 +126,7 @@ class PoolForComparison:
             print('pair file already exists and loaded')
 
     def get_unpaired(self):
+        """Calculate the number of unpaired products at each level in the product tree"""
         # find tree level of product
         level = find_level(self.product_tree, self.pivot['pivot'], 1) + 2
         # get number of children
@@ -138,6 +136,7 @@ class PoolForComparison:
         self.describe_unpaired = grouping
 
     def fetch_unpaired_group(self, group_name):
+        """Fetch all unpaired products within a specified group"""
         # Fetch all unpaired items
         self.get_unpaired()
 
@@ -159,6 +158,7 @@ class PoolForComparison:
         return group
 
     def select_group_name(self):
+        """Select first unpaired group"""
         self.get_unpaired()
         if len(list(self.describe_unpaired.keys())) > 0:
             self.group_name_selected = sorted(
@@ -167,6 +167,7 @@ class PoolForComparison:
             print('No more unpaired')
 
     def select_next_group_name(self):
+        """Select the next unpaired group after the current selection"""
         if len(list(self.describe_unpaired.keys())) <= 1 or self.group_name_selected is None:
             self.select_group_name()
         else:
@@ -182,13 +183,16 @@ class PoolForComparison:
             self.group_name_selected = selected
 
     def start_compare_pool(self, group_name):
+        """Initialize comparison pool for the selected group"""
         group = self.fetch_unpaired_group(group_name)
         self.comparepool = ComparePool(group, group_name)
 
     def get_matched_from_pool(self):
+        """Fetch matched pairs from the comparison pool"""
         return self.comparepool.return_pairs()
 
     def set_up_matched(self):
+        """Initialize the matched dataframe and list"""
         if os.path.exists(self.pair_file):
             self.matched_df = pd.read_csv(self.pair_file)
             self.matched = []
@@ -197,14 +201,14 @@ class PoolForComparison:
             self.matched_df = pd.DataFrame(columns=self.schema)
 
     def update_matched(self):
+        """Add newly matched pairs to the matched list"""
         matched = self.get_matched_from_pool()
         if matched not in self.matched:
             matched = {self.comparepool.group_name: matched}
             self.matched.append(matched)
 
     def rework_to_pair_file(self, match_dict: list):
-        # given match output from ComparePool reformat to add to match file
-        'crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site'
+        """Reformat the matched pairs for addition to the pair file"""
         match_name = list(match_dict.keys())[0]
         split = match_name.split('.')
         # get values
@@ -226,6 +230,7 @@ class PoolForComparison:
         return pd.DataFrame(reworked, columns=self.pair_df.columns)
 
     def consolidate_matched(self):
+        """Consolidate all matched pairs  and unmatched into the main pair dataframe"""
         for match in self.matched:
             # rework pair file entries from group name
             reworked = self.rework_to_pair_file(match)
@@ -244,7 +249,7 @@ class PoolForComparison:
                     self.pair_df.loc[self.pair_df.index.max()+1] = row
                 elif row[self.split_columns[1]] and row[self.split_columns[1]] not in self.pair_df[self.split_columns[1]].values:
                     self.pair_df.loc[self.pair_df.index.max()+1] = row
-        # update consolidated 
+        # update consolidated
         self.pair_df = self.pair_df.drop_duplicates(
             keep='first').reset_index(drop=True)
         # reset matched to blank
@@ -252,5 +257,3 @@ class PoolForComparison:
 
     def save_pair_df(self):
         self.pair_df.to_csv(self.pair_file, index=False)
-    
-    # next steps tkinter mayhaps
