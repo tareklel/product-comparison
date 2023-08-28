@@ -174,14 +174,8 @@ class TestSetupComparison(unittest.TestCase):
         self.assertEqual(self.test_obj.group_name_selected,
                          'crawl_date.2023-06-18.country.sa.gender.women.brand.Burberry.category.shoes.site')
         
-    def test_set_up_matched(self):
-        self.test_obj.set_up_matched()
-        df = pd.DataFrame(columns=self.test_obj.schema)
-        assert_frame_equal(self.test_obj.matched_df, df)
-        pd.DataFrame(columns=['b']).to_csv(self.test_obj.pair_file)
 
     def test_update_matched(self):
-        self.test_obj.set_up_matched()
         self.test_obj.comparepool = self.test_compare
         self.test_obj.comparepool.select_compare_a()
         self.test_obj.comparepool.select_compare_b()
@@ -195,7 +189,6 @@ class TestSetupComparison(unittest.TestCase):
     def test_rework_to_pair_file(self):
         self.test_obj.pair_file = 'app/tests/resources/compare/farfetch_mini_ounass_mini_match.csv'
         self.test_create_pair_file()
-        self.test_obj.set_up_matched()
         # use read matched dictionary
         with open('app/tests/resources/json/test_update_matched.json') as f:
             full = json.load(f)

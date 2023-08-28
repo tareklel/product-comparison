@@ -95,6 +95,7 @@ class PoolForComparison:
         self.schema = file['schema']
         # pivot defines where the tree splits to reveal the dimensions we're trying to compare
         self.pivot = file['pivot']
+        self.matched = []
 
         # get the pivot columns for comparing pairs
         self.identifiers = sorted(list(get_keys_within_key(
@@ -190,15 +191,6 @@ class PoolForComparison:
     def get_matched_from_pool(self):
         """Fetch matched pairs from the comparison pool"""
         return self.comparepool.return_pairs()
-
-    def set_up_matched(self):
-        """Initialize the matched dataframe and list"""
-        if os.path.exists(self.pair_file):
-            self.matched_df = pd.read_csv(self.pair_file)
-            self.matched = []
-        else:
-            self.matched = []
-            self.matched_df = pd.DataFrame(columns=self.schema)
 
     def update_matched(self):
         """Add newly matched pairs to the matched list"""
