@@ -15,7 +15,7 @@ class TestSetupComparison(unittest.TestCase):
 
         with open('app/tests/resources/json/test_fetch_unpaired_group_mini.json') as f:
             compare = json.load(f)
-    
+
         try:
             os.remove(
                 'app/tests/resources/output/farfetch_mini_ounass_mini_match.csv')
@@ -135,7 +135,7 @@ class TestSetupComparison(unittest.TestCase):
             }
         }
         self.assertEqual(self.test_compare.compare_a, test2)
-    
+
     # TEST PoolForComparison
 
     def test_create_pair_file(self):
@@ -143,6 +143,12 @@ class TestSetupComparison(unittest.TestCase):
             'app/tests/resources/compare/farfetch_mini_ounass_mini_match.csv')
         self.test_obj.create_pair_file()
         assert_frame_equal(self.test_obj.pair_df, test_df, check_dtype=False)
+    
+    def test_get_all_matched(self):
+        self.test_obj.pair_df = pd.read_csv('app/tests/resources/compare/test_get_all_matched.csv')
+        self.test_obj.get_all_matched()
+        test_matched = sorted(['panelled-design sneakers', 'Kenzoschool Boke Flower Slip-on Sneakers in Canvas'])
+        self.assertEqual(self.test_obj.matched, test_matched)
 
     def test_get_unpaired(self):
         compare = {'crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site': {'Farfetch.product_name': 33,
@@ -173,7 +179,6 @@ class TestSetupComparison(unittest.TestCase):
         self.test_obj.select_next_group_name()
         self.assertEqual(self.test_obj.group_name_selected,
                          'crawl_date.2023-06-18.country.sa.gender.women.brand.Burberry.category.shoes.site')
-        
 
     def test_update_matched(self):
         self.test_obj.comparepool = self.test_compare
@@ -193,13 +198,13 @@ class TestSetupComparison(unittest.TestCase):
         with open('app/tests/resources/json/test_update_matched.json') as f:
             full = json.load(f)
         reworked = self.test_obj.rework_to_pair_file(full)
-        compare = pd.read_csv('app/tests/resources/compare/test_rework_to_pair.csv')
+        compare = pd.read_csv(
+            'app/tests/resources/compare/test_rework_to_pair.csv')
         assert_frame_equal(reworked, compare)
-        
-
 
     def test_consolidated_matched(self):
-        df = pd.read_csv('app/tests/resources/compare/test_consolidate_matched.csv')
+        df = pd.read_csv(
+            'app/tests/resources/compare/test_consolidate_matched.csv')
         # check when passing mathced pair to df with the pairs unmatched
         self.test_obj.pair_df = df.iloc[1:]
         with open('app/tests/resources/json/test_consolidate_matched.json') as f:
@@ -208,27 +213,30 @@ class TestSetupComparison(unittest.TestCase):
         self.test_obj.consolidate_matched()
         assert_frame_equal(self.test_obj.pair_df, df.iloc[:1])
 
-        # check when matched pair introduced and matched already in 
+        # check when matched pair introduced and matched already in
         self.test_obj.pair_df = df.iloc[:1]
         self.test_obj.matched = [d['scenario_1']]
         self.test_obj.consolidate_matched()
         assert_frame_equal(self.test_obj.pair_df, df.iloc[:1])
 
-        #check when unmatched introduced to matched pair
+        # check when unmatched introduced to matched pair
         self.test_obj.pair_df = df.iloc[1:]
         self.test_obj.matched = [d['scenario_2']]
         self.test_obj.consolidate_matched()
-        assert_frame_equal(self.test_obj.pair_df, df.iloc[1:].reset_index(drop=True))
+        assert_frame_equal(self.test_obj.pair_df,
+                           df.iloc[1:].reset_index(drop=True))
 
         # check when unmatched introduced to unmatched different
         self.test_obj.pair_df = df.iloc[1:2].reset_index(drop=True)
         self.test_obj.matched = [d['scenario_2']]
         self.test_obj.consolidate_matched()
-        assert_frame_equal(self.test_obj.pair_df, df.iloc[1:].reset_index(drop=True))
+        assert_frame_equal(self.test_obj.pair_df,
+                           df.iloc[1:].reset_index(drop=True))
+
 
 if __name__ == '__main__':
     unittest.main()
-    
+
     try:
         os.remove(
             'app/tests/resources/output/farfetch_mini_ounass_mini_match.csv')

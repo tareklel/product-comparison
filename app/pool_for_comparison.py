@@ -115,19 +115,26 @@ class PoolForComparison:
             # write
             df.to_csv(self.pair_file, index=False)
         # load pair file if it exists
+        self.load_pair_file()
+
+    def load_pair_file(self):
         if not hasattr(self, 'pair_df'):
             self.pair_df = pd.read_csv(self.pair_file)
         else:
             print('pair file already exists and loaded')
+    
+    def get_all_matched(self):
+        """get all matched from pair_df and create a list"""
+        self.matched = self.pair_df[(self.pair_df[self.split_columns[0]].notna())&(self.pair_df[self.split_columns[1]].notna())]
+        self.matched = list(self.matched[self.split_columns[0]].unique()) + list(self.matched[self.split_columns[1]].unique())
+        self.matched = sorted(self.matched)
 
-    def load_pair_file(self):
-        if not self.pair_df:
-            self.pair_df = pd.read_csv(self.pair_file)
-        else:
-            print('pair file already exists and loaded')
+    def remove_matched(self):
+        """Remove matched pair objects from product_tree"""
+        return None
 
     def get_unpaired(self):
-        """Calculate the number of unpaired products at each level in the product tree"""
+        """Get group names + Calculate the number of unpaired products at each level in the product tree"""
         # find tree level of product
         level = find_level(self.product_tree, self.pivot['pivot'], 1) + 2
         # get number of children
