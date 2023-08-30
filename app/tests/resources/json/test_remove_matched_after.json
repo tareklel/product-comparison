@@ -1,0 +1,38 @@
+{
+    "crawl_date": {
+        "2023-06-18": {
+            "country": {
+                "sa": {
+                    "gender": {
+                        "women": {
+                            "brand": {
+                                "Burberry": {
+                                    "category": {
+                                        "shoes": {
+                                            "site": {
+                                                "Farfetch": {
+                                                    "product_name": {
+                                                        "House Check sneakers": {
+                                                            "text": "['House Check sneakers', 'Made In Italy', 'FARFETCH ID: ', 'Brand style ID: ']"
+                                                        }
+                                                    }
+                                                },
+                                                "Ounass": {
+                                                    "product_name": {
+                                                        "Sneakers in Leather & House Check Cotton ": {
+                                                            "text": "These chic and contemporary sneakers from Burberry are the perfect pair to complete your casual edits. The low-top silhouette is defined with panels of House Check cotton and calf leather, and finished with an embossed logo on the heel. For off-duty days, style with a sweater and jeans."
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

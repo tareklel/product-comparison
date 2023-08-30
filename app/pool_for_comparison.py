@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import json
 import numpy as np
-from app.helpers import get_keys_within_key, find_level, count_children, get_grouping
+from app.helpers import get_keys_within_key, find_level, count_children, get_grouping, remove_keys_from_level
 
 
 class ComparePool:
@@ -122,16 +122,20 @@ class PoolForComparison:
             self.pair_df = pd.read_csv(self.pair_file)
         else:
             print('pair file already exists and loaded')
-    
+
     def get_all_matched(self):
         """get all matched from pair_df and create a list"""
-        self.matched = self.pair_df[(self.pair_df[self.split_columns[0]].notna())&(self.pair_df[self.split_columns[1]].notna())]
-        self.matched = list(self.matched[self.split_columns[0]].unique()) + list(self.matched[self.split_columns[1]].unique())
+        self.matched = self.pair_df[(self.pair_df[self.split_columns[0]].notna()) & (
+            self.pair_df[self.split_columns[1]].notna())]
+        self.matched = list(self.matched[self.split_columns[0]].unique(
+        )) + list(self.matched[self.split_columns[1]].unique())
         self.matched = sorted(self.matched)
 
     def remove_matched(self):
         """Remove matched pair objects from product_tree"""
-        return None
+        # find tree level of product
+        level = find_level(self.product_tree, self.pivot['pivot'], 1) + 2
+        self.product_tree = remove_keys_from_level(self.product_tree, self.matched, level)
 
     def get_unpaired(self):
         """Get group names + Calculate the number of unpaired products at each level in the product tree"""
