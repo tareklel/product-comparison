@@ -143,24 +143,13 @@ class TestSetupComparison(unittest.TestCase):
             'app/tests/resources/compare/farfetch_mini_ounass_mini_match.csv')
         self.test_obj.create_pair_file()
         assert_frame_equal(self.test_obj.pair_df, test_df, check_dtype=False)
-    
-    def test_get_all_matched(self):
-        self.test_obj.pair_df = pd.read_csv('app/tests/resources/compare/test_get_all_matched.csv')
-        self.test_obj.get_all_matched()
-        test_matched = sorted(['panelled-design sneakers', 'Kenzoschool Boke Flower Slip-on Sneakers in Canvas'])
-        self.assertEqual(self.test_obj.matched, test_matched)
-
-    def test_remove_matched(self):
-        self.test_obj.matched = ['checked low-top sneakers', 'Sneakers in Leather and House Check Cotton']
-        with open('app/tests/resources/json/test_remove_matched.json') as f:
-            self.test_obj.product_tree = json.load(f)
-        
-        self.test_obj.remove_matched()
-
-        with open('app/tests/resources/json/test_remove_matched_after.json') as f:
-            compare = json.load(f)
-        
-        self.assertEqual(self.test_obj.product_tree, compare)
+ 
+    def test_matched_to_singles(self):
+        df = pd.read_csv(
+            'app/tests/resources/compare/test_consolidate_matched.csv')
+        self.test_obj.pair_df = df
+        match = pd.read_csv('app/tests/resources/compare/test_matched_to_tree.csv')
+        assert_frame_equal(self.test_obj.matched_to_singles(), match)
 
     def test_get_unpaired(self):
         compare = {'crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site': {'Farfetch.product_name': 33,

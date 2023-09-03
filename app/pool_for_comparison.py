@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import json
 import numpy as np
-from app.helpers import get_keys_within_key, find_level, count_children, get_grouping, remove_keys_from_level
+from app.helpers import get_keys_within_key, find_level, count_children, get_grouping, df_to_nested_dict
 
 
 class ComparePool:
@@ -123,19 +123,30 @@ class PoolForComparison:
         else:
             print('pair file already exists and loaded')
 
-    def get_all_matched(self):
-        """get all matched from pair_df and create a list"""
-        self.matched = self.pair_df[(self.pair_df[self.split_columns[0]].notna()) & (
+    def matched_to_singles(self):
+        """turns matched pairs from matched_df into tree"""
+        # turn pair_df to adhere to self.schema
+        # get only matched from pair_df
+        matched = self.pair_df[(self.pair_df[self.split_columns[0]].notna()) & (
             self.pair_df[self.split_columns[1]].notna())]
-        self.matched = list(self.matched[self.split_columns[0]].unique(
-        )) + list(self.matched[self.split_columns[1]].unique())
-        self.matched = sorted(self.matched)
+        # get matched_df for matched to first
+        matched1 = matched[[
+            x for x in matched.columns if x != self.split_columns[1]]]
+        matched1[self.pivot['pivot']] = self.identifiers[0]
+        matched1 = matched1.rename(
+            {self.split_columns[0]: self.pivot['pivot_unique']}, axis=1)
+        matched1 = matched1[self.schema]
+        matched2 = matched[[
+            x for x in matched.columns if x != self.split_columns[0]]]
+        matched2[self.pivot['pivot']] = self.identifiers[1]
+        matched2 = matched2.rename(
+            {self.split_columns[1]: self.pivot['pivot_unique']}, axis=1)
+        matched2 = matched2[self.schema]
+        matched1 = pd.concat([matched1, matched2]).reset_index(drop=True)
 
-    def remove_matched(self):
-        """Remove matched pair objects from product_tree"""
-        # find tree level of product
-        level = find_level(self.product_tree, self.pivot['pivot'], 1) + 2
-        self.product_tree = remove_keys_from_level(self.product_tree, self.matched, level)
+        return matched1
+
+    #def matched_to
 
     def get_unpaired(self):
         """Get group names + Calculate the number of unpaired products at each level in the product tree"""

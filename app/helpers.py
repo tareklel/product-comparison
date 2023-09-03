@@ -90,24 +90,17 @@ def get_grouping(children, divider):
 
     return {k: compared[k] for k in sorted(compared)}
 
-def remove_keys_from_level(tree, keys_to_remove, target_level, current_level=0):
-    """
-    Removes keys at a specific level in a nested dictionary.
-
-    Parameters:
-        tree (dict): The nested dictionary.
-        keys_to_remove (list): List of keys to remove.
-        target_level (int): The level at which to remove keys.
-        current_level (int, optional): The current level during traversal. Defaults to 0.
-
-    Returns:
-        dict: The modified dictionary.
-    """
-    if not isinstance(tree, dict):
-        return tree
+def df_to_nested_dict(df, columns):
+    # Base Case: If no more columns are left, return empty string
+    if len(columns) == 1:
+        return ""
     
-    if current_level == target_level:
-        return {key: value for key, value in tree.items() if key not in keys_to_remove}
-
-    return {key: remove_keys_from_level(value, keys_to_remove, target_level, current_level + 1)
-            for key, value in tree.items()}
+    # Recursive Case
+    col = columns[0]
+    nested_dict = {}
+    
+    for key, group in df.groupby(col):
+        remaining_columns = columns[1:]
+        nested_dict[key] = {col: df_to_nested_dict(group.drop(columns=[col]), remaining_columns)}
+        
+    return nested_dict
