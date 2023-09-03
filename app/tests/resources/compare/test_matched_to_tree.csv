@@ -1,3 +1,4 @@
-crawl_date,country,gender,brand,category,site,product_name
-2023-06-18,sa,women,KENZO,shoes,Farfetch,panelled-design sneakers
-2023-06-18,sa,women,KENZO,shoes,Ounass,Kenzoschool Boke Flower Slip-on Sneakers in Canvas
+crawl_date,country,gender,brand,category,Farfetch_product_name,Ounass_product_name
+2023-06-18,sa,women,KENZO,shoes,panelled-design sneakers,Kenzoschool Boke Flower Slip-on Sneakers in Canvas
+2023-06-18,sa,women,KENZO,shoes,,Kenzoschool Boke Flower Slip-on Sneakers in Canvas
+2023-06-18,sa,women,KENZO,shoes,panelled-design sneakers,

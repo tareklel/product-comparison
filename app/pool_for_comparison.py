@@ -146,7 +146,9 @@ class PoolForComparison:
 
         return matched1
 
-    #def matched_to
+    def matched_to_tree(self):
+        matched_split = self.matched_to_singles()
+        return df_to_nested_dict(matched_split, self.schema)
 
     def get_unpaired(self):
         """Get group names + Calculate the number of unpaired products at each level in the product tree"""

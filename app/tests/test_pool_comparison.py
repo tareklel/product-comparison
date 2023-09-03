@@ -148,8 +148,21 @@ class TestSetupComparison(unittest.TestCase):
         df = pd.read_csv(
             'app/tests/resources/compare/test_consolidate_matched.csv')
         self.test_obj.pair_df = df
-        match = pd.read_csv('app/tests/resources/compare/test_matched_to_tree.csv')
+        match = pd.read_csv('app/tests/resources/compare/test_matched_to_singles.csv')
         assert_frame_equal(self.test_obj.matched_to_singles(), match)
+
+    def test_matched_to_tree(self):
+        df = pd.read_csv(
+            'app/tests/resources/compare/test_consolidate_matched.csv'
+        )
+        self.test_obj.pair_df = df
+        test_tree = self.test_obj.matched_to_tree()
+        with open('app/tests/resources/output/dump.json', 'w') as f:
+            json.dump(test_tree, f)
+        with open('app/tests/resources/json/test_matched_to_tree.json') as f:
+            compare = json.load(f)
+        self.assertEqual(test_tree, compare)
+
 
     def test_get_unpaired(self):
         compare = {'crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site': {'Farfetch.product_name': 33,
@@ -165,12 +178,6 @@ class TestSetupComparison(unittest.TestCase):
         with open('app/tests/resources/json/test_fetch_unpaired_group.json') as f:
             compare = json.load(f)
         self.assertEqual(asserted_pair, compare)
-
-    def test_select_group_name(self):
-
-        self.test_obj.select_group_name()
-        self.assertEqual(self.test_obj.group_name_selected,
-                         'crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site')
 
     def test_select_group_name(self):
         self.test_obj.select_group_name()
