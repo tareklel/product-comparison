@@ -116,3 +116,30 @@ def df_to_nested_dict(df, columns):
                 group.drop(columns=[col]), remaining_columns)
 
     return nested_dict
+
+
+def remove_from_tree(d1: dict, d2: dict, level, target_level):
+    """traverses both dictionaries level-by-level. 
+    When it reaches the target level, it marks keys for deletion from the first dictionary (d1) 
+    if they are also present in the second dictionary (d2). 
+    Then it proceeds to delete those keys. 
+    This process effectively removes the branches from d1 that are specified by d2."""
+    keys_to_delete = []
+    # Loop through keys in the second dictionary
+    for key in d2.keys():
+
+        # If the key is present in the first dictionary
+        if key in d1:
+
+            # If the current level matches the target level, mark key for deletion
+            if level == target_level:
+                keys_to_delete.append(key)
+                continue
+
+            # If both values are dictionaries, proceed to the next level
+            if isinstance(d1[key], dict) and isinstance(d2[key], dict):
+                remove_from_tree(d1[key], d2[key], level + 1, target_level)
+
+    # Delete marked keys from the first dictionary
+    for key in keys_to_delete:
+        del d1[key]

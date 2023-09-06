@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import json
 import numpy as np
-from app.helpers import get_keys_within_key, find_level, count_children, get_grouping, df_to_nested_dict
+from app.helpers import get_keys_within_key, find_level, count_children, get_grouping, df_to_nested_dict, remove_from_tree
 
 
 class ComparePool:
@@ -147,8 +147,14 @@ class PoolForComparison:
         return matched1
 
     def matched_to_tree(self):
+        """turns matched to singles and then to tree"""
         matched_split = self.matched_to_singles()
         return df_to_nested_dict(matched_split, self.schema)
+
+    def remove_matched_from_tree(self):
+        matched = self.matched_to_tree()
+        target_level = find_level(self.product_tree, self.pivot['pivot_unique']) + 1
+        remove_from_tree(self.product_tree, matched, 1 ,target_level)
 
     def get_unpaired(self):
         """Get group names + Calculate the number of unpaired products at each level in the product tree"""

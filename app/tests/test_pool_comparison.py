@@ -157,12 +157,23 @@ class TestSetupComparison(unittest.TestCase):
         )
         self.test_obj.pair_df = df
         test_tree = self.test_obj.matched_to_tree()
-        with open('app/tests/resources/output/dump.json', 'w') as f:
-            json.dump(test_tree, f)
         with open('app/tests/resources/json/test_matched_to_tree.json') as f:
             compare = json.load(f)
         self.assertEqual(test_tree, compare)
 
+    def test_remove_matched_from_tree(self):
+        df = pd.read_csv(
+            'app/tests/resources/compare/test_consolidate_matched.csv'
+        )
+
+        self.test_obj.pair_df = df
+        with open('app/tests/resources/json/test_remove_matched_to_tree_product_tree.json') as f: 
+            self.test_obj.product_tree = json.load(f)
+
+        with open('app/tests/resources/json/test_remove_matched_to_tree.json') as f:
+            compare = json.load(f)
+        self.test_obj.remove_matched_from_tree()
+        self.assertEqual(self.test_obj.product_tree, compare)
 
     def test_get_unpaired(self):
         compare = {'crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site': {'Farfetch.product_name': 33,
