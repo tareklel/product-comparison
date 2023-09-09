@@ -152,9 +152,12 @@ class PoolForComparison:
         return df_to_nested_dict(matched_split, self.schema)
 
     def remove_matched_from_tree(self):
-        matched = self.matched_to_tree()
-        target_level = find_level(self.product_tree, self.pivot['pivot_unique']) + 1
-        remove_from_tree(self.product_tree, matched, 1 ,target_level)
+        if not self.pair_df.empty:
+            matched = self.matched_to_tree()
+            target_level = find_level(self.product_tree, self.pivot['pivot_unique']) + 1
+            remove_from_tree(self.product_tree, matched, 1 ,target_level)
+        else:
+            print('pair_df is empty')
 
     def get_unpaired(self):
         """Get group names + Calculate the number of unpaired products at each level in the product tree"""

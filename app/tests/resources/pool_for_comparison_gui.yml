@@ -1,0 +1,4 @@
+product_tree: "app/tests/resources/json/farfetch_mini_ounass_mini.json"
+pair_file_dest: "app/tests/resources/gui/"
+schema: ['crawl_date', 'country', 'gender', 'brand', 'category', 'site', 'product_name']
+pivot: {'pivot':'site', 'pivot_unique':'product_name'}
