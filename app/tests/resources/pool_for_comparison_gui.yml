@@ -15,6 +15,6 @@ schema:
 pivot: { "pivot": "site", "pivot_unique": "portal_itemid" }
 images_dest:
   {
-    "farfetch": "input/images/farfetch/2023-06-18",
-    "ounass": "input/images/ounass/2023-06-18",
+    "Farfetch": "input/images/farfetch/2023-06-18",
+    "Ounass": "input/images/ounass/2023-06-18",
   }

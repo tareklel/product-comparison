@@ -8,6 +8,7 @@ authors = ["Tarik El Lel <tareklel@gmail.com>"]
 python = "~3.9"
 pandas = "^2.0.3"
 PyYAML = "^6.0"
+pillow = "^10.0.1"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^2.0.2"

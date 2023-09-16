@@ -3,7 +3,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 import os
 from app.pool_for_comparison import PoolForComparison, ComparePool
-from tkinter import PhotoImage
+from PIL import Image, ImageTk
 
 
 class LoadPage:
@@ -58,7 +58,11 @@ class GuiPoolForComparison(tk.Toplevel):
 
     def select_group(self, selected_value):
         print(selected_value)
-        self.pool.start_compare_pool(selected_value)
+        if self.pool.file['images_dest']:
+            self.pool.start_compare_pool(selected_value, self.pool.file['images_dest'])
+        else:
+            self.pool.start_compare_pool(selected_value)
+        
         GuiComparePool(self.pool.comparepool)
 
 
@@ -97,16 +101,19 @@ class GuiComparePool(tk.Toplevel):
 
 
         # get image for compare a
-        # image_a = self.get_images(next(iter(self.obj.compare_a)))
+        self.image_a = self.get_images(self.obj.first_group_key, next(iter(self.obj.compare_a)))
+        self.image1_label = tk.Label(self, image=self.image_a)
 
-        
+
+        self.image1_label.grid(sticky='w', row=5, column=1)
+
 
         # add for spacing 2
         empty_frame2 = tk.Frame(self, height=20, width=20)
-        empty_frame2.grid(sticky='w', row=5, column=0)
+        empty_frame2.grid(sticky='w', row=6, column=0)
 
         self.pool_name_b = tk.Label(self, text=self.obj.second_group_key)
-        self.pool_name_b.grid(sticky='w', row=6, column=1)
+        self.pool_name_b.grid(sticky='w', row=7, column=1)
 
         # Loop through the dictionary and create radio buttons
         radio_selected_key = tk.StringVar()
@@ -115,13 +122,13 @@ class GuiComparePool(tk.Toplevel):
         # Create a canvas and a vertical scrollbar
         self.canvas_scroll = tk.Canvas(self, width=900, height=500)
 
-        self.canvas_scroll.grid(sticky='w', row=7, column=1)
+        self.canvas_scroll.grid(sticky='w', row=8, column=1)
         self.scrollbar = tk.Scrollbar(
             self, orient="vertical", command=self.canvas_scroll.yview)
 
         # Configure the canvas
         self.canvas_scroll.config(yscrollcommand=self.scrollbar.set)
-        self.scrollbar.grid(sticky='ns', row=7, column=0)
+        self.scrollbar.grid(sticky='ns', row=8, column=0)
 
         # Frame inside canvas with radio
         self.frame1 = tk.Frame(self.canvas_scroll)
@@ -144,11 +151,26 @@ class GuiComparePool(tk.Toplevel):
         self.radio_select = tk.Button(
             self, text="Match products", command='')
 
-        self.radio_select.grid(sticky='w', row=8, column=1)
+        self.radio_select.grid(sticky='w', row=9, column=1)
+
+    def get_image_files(self, directory, extensions=['.jpg', '.png', '.gif']):
+        return [os.path.join(directory, f) for f in os.listdir(directory)
+                if os.path.isfile(os.path.join(directory, f)) and any(f.lower().endswith(ext) for ext in extensions)]
 
     def get_images(self, group, key):
-        images_dest = self.pool.images_dest[group]
-        image_dir = [d for d in  os.listdir(images_dest) if os.path.isdir(os.path.join(images_dest, d)) and '15874564' in d][0]
+
+        images_dest = self.obj.args[0][0][group]
+        image_dir = [os.path.join(images_dest, d) for d in  os.listdir(images_dest) if os.path.isdir(os.path.join(images_dest, d)) and key in d][0]
+        # get images path from list
+        images = self.get_image_files(image_dir)
+        print(images)
+        image = Image.open(images[0])
+        image = image.resize((200, 200))
+        photo = ImageTk.PhotoImage(image)
+        return photo
+
+
+
 
         
 

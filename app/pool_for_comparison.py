@@ -7,10 +7,11 @@ from app.helpers import get_keys_within_key, find_level, count_children, get_gro
 
 
 class ComparePool:
-    def __init__(self, group, group_name):
+    def __init__(self, group, group_name, *args):
         self.group = group
         self.group_name = group_name
         self.initialize_keys()
+        self.args = args
         self.matched = []
 
     def initialize_keys(self):
@@ -95,6 +96,7 @@ class PoolForComparison:
         self.schema = file['schema']
         # pivot defines where the tree splits to reveal the dimensions we're trying to compare
         self.pivot = file['pivot']
+        self.file = file
         self.matched = []
 
         # get the pivot columns for comparing pairs
@@ -216,10 +218,10 @@ class PoolForComparison:
 
             self.group_name_selected = selected
 
-    def start_compare_pool(self, group_name):
+    def start_compare_pool(self, group_name, *args):
         """Initialize comparison pool for the selected group"""
         group = self.fetch_unpaired_group(group_name)
-        self.comparepool = ComparePool(group, group_name)
+        self.comparepool = ComparePool(group, group_name, args)
 
     def get_matched_from_pool(self):
         """Fetch matched pairs from the comparison pool"""
