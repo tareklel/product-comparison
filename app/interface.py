@@ -57,12 +57,12 @@ class GuiPoolForComparison(tk.Toplevel):
         select_button.pack()
 
     def select_group(self, selected_value):
-        print(selected_value)
         if self.pool.file['images_dest']:
-            self.pool.start_compare_pool(selected_value, self.pool.file['images_dest'])
+            self.pool.start_compare_pool(
+                selected_value, self.pool.file['images_dest'])
         else:
             self.pool.start_compare_pool(selected_value)
-        
+
         GuiComparePool(self.pool.comparepool)
 
 
@@ -74,45 +74,58 @@ class GuiComparePool(tk.Toplevel):
         self.geometry("1300x900")
         self.obj.select_compare_a()
         self.obj.select_compare_b()
-        self.group_name = tk.Label(self, text=self.obj.group_name)
+
+        # Create a canvas and a vertical scrollbar
+        self.canvas = tk.Canvas(self)
+        self.main_scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.main_scrollbar.pack(side="left", fill="y")
+
+        # Configure the canvas
+        self.canvas.pack(side="right", fill="both", expand=True)
+        self.canvas.configure(yscrollcommand=self.main_scrollbar.set)
+        self.canvas.bind('<Configure>', lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        # Create a frame inside the canvas and add it to the canvas window
+        self.frame = tk.Frame(self.canvas)
+        self.canvas.create_window((0,0), window=self.frame, anchor="nw")
+
+        self.group_name = tk.Label(self.frame, text=self.obj.group_name)
         self.group_name.grid(sticky='w', row=0, column=1)
 
+
         self.next_button = tk.Button(
-            self, text='Next Compare Group', command=lambda: '')
+            self.frame, text='Next Compare Group', command=lambda: '')
         self.save_close_button = tk.Button(
-            self, text='Save and Close', command=lambda: '')
-        self.next_button.grid(sticky='w', row=0, column=2)
-        self.save_close_button.grid(sticky='w', row=0, column=3)
+            self.frame, text='Save and Close', command=lambda: '')
+        self.next_button.grid(sticky='w', row=0, column=3)
+        self.save_close_button.grid(sticky='w', row=0, column=4)
 
         # add for spacing
-        empty_frame = tk.Frame(self, height=20, width=20)
+        empty_frame = tk.Frame(self.frame, height=20, width=20)
         empty_frame.grid(sticky='w', row=1, column=1)
 
         # get compare a products
-        self.pool_name_a = tk.Label(self, text=self.obj.first_group_key)
+        self.pool_name_a = tk.Label(self.frame, text=self.obj.first_group_key)
         self.compare_a_name = tk.Label(
-            self, text=next(iter(self.obj.compare_a)))
+            self.frame, text=next(iter(self.obj.compare_a)))
         self.compare_a_description = tk.Label(
-            self, text=self.obj.compare_a[next(iter(self.obj.compare_a))])
+            self.frame, text=self.obj.compare_a[next(iter(self.obj.compare_a))], wraplength=600)
 
         self.pool_name_a.grid(sticky='w', row=2, column=1)
         self.compare_a_name.grid(sticky='w', row=3, column=1)
         self.compare_a_description.grid(sticky='w', row=4, column=1)
 
-
         # get image for compare a
-        self.image_a = self.get_images(self.obj.first_group_key, next(iter(self.obj.compare_a)))
-        self.image1_label = tk.Label(self, image=self.image_a)
-
-
-        self.image1_label.grid(sticky='w', row=5, column=1)
-
+        self.image_a = self.get_images(
+            self.obj.first_group_key, next(iter(self.obj.compare_a)))
+        if self.image_a:
+            self.image1_label = tk.Label(self.frame, image=self.image_a)
+            self.image1_label.grid(sticky='w', row=4, column=2)
 
         # add for spacing 2
-        empty_frame2 = tk.Frame(self, height=20, width=20)
+        empty_frame2 = tk.Frame(self.frame, height=20, width=20)
         empty_frame2.grid(sticky='w', row=6, column=0)
 
-        self.pool_name_b = tk.Label(self, text=self.obj.second_group_key)
+        self.pool_name_b = tk.Label(self.frame, text=self.obj.second_group_key)
         self.pool_name_b.grid(sticky='w', row=7, column=1)
 
         # Loop through the dictionary and create radio buttons
@@ -120,38 +133,46 @@ class GuiComparePool(tk.Toplevel):
         # Frame for radio buttons (using pack)
 
         # Create a canvas and a vertical scrollbar
-        self.canvas_scroll = tk.Canvas(self, width=900, height=500)
+        self.canvas_compare2 = tk.Canvas(self.frame, width=700, height=500)
 
-        self.canvas_scroll.grid(sticky='w', row=8, column=1)
-        self.scrollbar = tk.Scrollbar(
-            self, orient="vertical", command=self.canvas_scroll.yview)
+        self.canvas_compare2.grid(sticky='w', row=8, column=1)
+        self.compare_2_scrollbar = tk.Scrollbar(
+            self.frame, orient="vertical", command=self.canvas_compare2.yview)
 
         # Configure the canvas
-        self.canvas_scroll.config(yscrollcommand=self.scrollbar.set)
-        self.scrollbar.grid(sticky='ns', row=8, column=0)
+        self.canvas_compare2.config(yscrollcommand=self.compare_2_scrollbar.set)
+        self.compare_2_scrollbar.grid(sticky='ns', row=8, column=0)
 
         # Frame inside canvas with radio
-        self.frame1 = tk.Frame(self.canvas_scroll)
+        self.frame1 = tk.Frame(self.canvas_compare2)
         self.frame1.grid(sticky='w', row=0, column=0)
-        for key, value in self.obj.product_b_list.items():
+        self.image2_dict = {}
+        for i, (key, value) in enumerate(self.obj.product_b_list.items()):
             tk.Radiobutton(self.frame1,
                            text=key,
                            variable=radio_selected_key,
-                           value=key).pack(anchor='w')
-            tk.Label(self.frame1, text=value, wraplength=900).pack(anchor='w')
+                           value=key).grid(sticky='ns', row=i * 2, column=0)
+            tk.Label(self.frame1, text=value, wraplength=600).grid(sticky='ns', row=i * 2 + 1, column=0)
+            # get image for compare a
+            image_b = self.get_images(
+                self.obj.second_group_key, key)
+            if image_b:
+                self.image2_dict[key] = image_b
+                self.imageb_label = tk.Label(self.frame1, image=self.image2_dict[key])
+                self.imageb_label.grid(sticky='ns', row=i * 2 + 1, column=1)
 
-        self.canvas_scroll.create_window(
+        self.canvas_compare2.create_window(
             (0, 0), window=self.frame1, anchor="nw")
 
         # Update the scrollregion after configuring the interior frame
         self.frame1.update_idletasks()
-        self.canvas_scroll.config(scrollregion=self.canvas_scroll.bbox("all"))
+        self.canvas_compare2.config(scrollregion=self.canvas_compare2.bbox("all"))
 
         # Add a button to print the selected value
         self.radio_select = tk.Button(
-            self, text="Match products", command='')
+            self.frame, text="Match products", command='')
 
-        self.radio_select.grid(sticky='w', row=9, column=1)
+        self.radio_select.grid(sticky='w', row=0, column=2)
 
     def get_image_files(self, directory, extensions=['.jpg', '.png', '.gif']):
         return [os.path.join(directory, f) for f in os.listdir(directory)
@@ -160,19 +181,18 @@ class GuiComparePool(tk.Toplevel):
     def get_images(self, group, key):
 
         images_dest = self.obj.args[0][0][group]
-        image_dir = [os.path.join(images_dest, d) for d in  os.listdir(images_dest) if os.path.isdir(os.path.join(images_dest, d)) and key in d][0]
+        image_dir = [os.path.join(images_dest, d) for d in os.listdir(
+            images_dest) if os.path.isdir(os.path.join(images_dest, d)) and key in d]
+        if image_dir:
+            image_dir = image_dir[0]
+        else:
+            return None
         # get images path from list
         images = self.get_image_files(image_dir)
-        print(images)
         image = Image.open(images[0])
-        image = image.resize((200, 200))
+        image = image.resize((100, 100))
         photo = ImageTk.PhotoImage(image)
         return photo
-
-
-
-
-        
 
 
 # Create Tkinter window and the app instance
