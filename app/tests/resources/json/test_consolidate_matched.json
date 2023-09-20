@@ -37,5 +37,35 @@
                 }
             }
         }
+    },
+    "scenario_3": {
+        "crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site": {
+            "matched": [
+                {
+                    "Farfetch": {
+                        "matched_farfetch": {
+                            "text": "['panelled-design sneakers', 'FARFETCH ID: ', 'Brand style ID: ']"
+                        }
+                    },
+                    "Ounass": {
+                        "matched_ounass": {
+                            "text": "An iconic sneaker that evokes the designer's Japanese heritage with a signature boke flower that decorates the upper proudly. Crafted from canvas, the slip-on silhouette are topped with elasticated sides which make them easy to put on and slide off,. "
+                        }
+                    }
+                }
+            ],
+            "unmatched": {
+                "Farfetch": {
+                    "panelled-design sneakers": {
+                        "text": "['panelled-design sneakers', 'FARFETCH ID: ', 'Brand style ID: ']"
+                    }
+                },
+                "Ounass": {
+                    "Kenzoschool Boke Flower Slip-on Sneakers in Canvas": {
+                        "text": "An iconic sneaker that evokes the designer's Japanese heritage with a signature boke flower that decorates the upper proudly. Crafted from canvas, the slip-on silhouette are topped with elasticated sides which make them easy to put on and slide off,. "
+                    }
+                }
+            }
+        }
     }
 }

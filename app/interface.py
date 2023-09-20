@@ -43,14 +43,14 @@ class GuiPoolForComparison(tk.Toplevel):
         self.pool.create_pair_file()
         self.pool.remove_matched_from_tree()
         self.pool.get_unpaired()
-        self.options = list(self.pool.describe_unpaired.keys())
+        self.options = list(self.pool.describe_unpaired)
 
         # Create a StringVar to hold the selected value
-        selected_value = tk.StringVar(self)
-        selected_value.set("Select group")  # default value
+        self.selected_value = tk.StringVar(self)
+        self.selected_value.set("Select group")  # default value
         # Create the dropdown menu
-        dropdown = tk.OptionMenu(self, selected_value, *self.options)
-        dropdown.pack()
+        self.dropdown = tk.OptionMenu(self, self.selected_value, *self.options)
+        self.dropdown.pack()
         # Create the 'Select' button
         select_button = tk.Button(
             self, text="Select", command=lambda: self.select_group(selected_value.get()))
@@ -61,12 +61,12 @@ class GuiPoolForComparison(tk.Toplevel):
         print_matched.pack()
 
         consolidate = tk.Button(
-            self, text="Consolidate Matched", command=self.consolidate_matched)
+            self, text="Consolidate and Save", command=self.consolidate_and_save)
         consolidate.pack()
 
     def select_group(self, selected_value):
         if any(selected_value in d for d in self.pool.matched):
-            return
+            print('Group matched has already been saved')
         if self.pool.file['images_dest']:
             self.pool.start_compare_pool(
                 selected_value, self.pool.file['images_dest'])
@@ -78,9 +78,16 @@ class GuiPoolForComparison(tk.Toplevel):
     def print_matched(self):
         print(self.pool.matched)
     
-    def consolidate_matched(self):
-        # self.pool.consolidate_matched()
-        return
+    def consolidate_and_save(self):
+        self.pool.consolidate_matched()
+        print(self.pool.pair_df)
+        self.pool.save_pair_df()
+        # Create a StringVar to hold the selected value
+        self.dropdown['menu'].delete(0, 'end')
+        self.selected_value.set("Select group")  # default value
+        # Create the dropdown menu
+        for option in self.options:
+            self.dropdown['menu'].add_command(label=option, command = tk._setit(self.selected_value, option))
 
 
 class GuiComparePool(tk.Toplevel):

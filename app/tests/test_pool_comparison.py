@@ -251,6 +251,13 @@ class TestSetupComparison(unittest.TestCase):
         self.test_obj.consolidate_matched()
         assert_frame_equal(self.test_obj.pair_df,
                            df.iloc[1:].reset_index(drop=True))
+        
+        # check when matched and unmatched consolidated
+        self.test_obj.pair_df = df.iloc[0:0]
+        compare = pd.read_csv('app/tests/resources/compare/test_consolidate_matched_2.csv')
+        self.test_obj.matched = [d['scenario_3']]
+        self.test_obj.consolidate_matched()
+        assert_frame_equal(self.test_obj.pair_df, compare)
 
 
 if __name__ == '__main__':

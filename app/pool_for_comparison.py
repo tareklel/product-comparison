@@ -273,8 +273,10 @@ class PoolForComparison:
                     self.pair_df = self.pair_df.reset_index(drop=True)
                     self.pair_df.loc[self.pair_df.index.max()+1] = row
                 elif row[self.split_columns[0]] and row[self.split_columns[0]] not in self.pair_df[self.split_columns[0]].values:
+                    self.pair_df = self.pair_df.reset_index(drop=True)
                     self.pair_df.loc[self.pair_df.index.max()+1] = row
                 elif row[self.split_columns[1]] and row[self.split_columns[1]] not in self.pair_df[self.split_columns[1]].values:
+                    self.pair_df = self.pair_df.reset_index(drop=True)
                     self.pair_df.loc[self.pair_df.index.max()+1] = row
         # update consolidated
         self.pair_df = self.pair_df.drop_duplicates(
