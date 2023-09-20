@@ -80,7 +80,6 @@ class GuiPoolForComparison(tk.Toplevel):
     
     def consolidate_and_save(self):
         self.pool.consolidate_matched()
-        print(self.pool.pair_df)
         self.pool.save_pair_df()
         # Create a StringVar to hold the selected value
         self.dropdown['menu'].delete(0, 'end')
