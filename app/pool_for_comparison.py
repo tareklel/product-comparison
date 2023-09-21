@@ -93,6 +93,7 @@ class PoolForComparison:
         self.pair_file = file['pair_file_dest'] + \
             (file['product_tree'].split('.')[0]).split('/')[-1]
         self.pair_file = self.pair_file + '_match.csv'
+        print(self.pair_file)
         self.schema = file['schema']
         # pivot defines where the tree splits to reveal the dimensions we're trying to compare
         self.pivot = file['pivot']
@@ -122,6 +123,7 @@ class PoolForComparison:
     def load_pair_file(self):
         if not hasattr(self, 'pair_df'):
             self.pair_df = pd.read_csv(self.pair_file)
+            self.pair_df[self.split_columns] = self.pair_df[self.split_columns].astype(str)
         else:
             print('pair file already exists and loaded')
 
@@ -137,12 +139,16 @@ class PoolForComparison:
         matched1[self.pivot['pivot']] = self.identifiers[0]
         matched1 = matched1.rename(
             {self.split_columns[0]: self.pivot['pivot_unique']}, axis=1)
+        for col in [col for col in self.schema if col not in matched1.columns]:
+            matched1[col] = np.nan
         matched1 = matched1[self.schema]
         matched2 = matched[[
             x for x in matched.columns if x != self.split_columns[0]]]
         matched2[self.pivot['pivot']] = self.identifiers[1]
         matched2 = matched2.rename(
             {self.split_columns[1]: self.pivot['pivot_unique']}, axis=1)
+        for col in [col for col in self.schema if col not in matched2.columns]:
+            matched2[col] = np.nan
         matched2 = matched2[self.schema]
         matched1 = pd.concat([matched1, matched2]).reset_index(drop=True)
 
@@ -156,6 +162,7 @@ class PoolForComparison:
     def remove_matched_from_tree(self):
         if not self.pair_df.empty:
             matched = self.matched_to_tree()
+            print(matched)
             target_level = find_level(self.product_tree, self.pivot['pivot_unique']) + 1
             remove_from_tree(self.product_tree, matched, 1 ,target_level)
         else:
