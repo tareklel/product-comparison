@@ -259,6 +259,15 @@ class TestSetupComparison(unittest.TestCase):
         self.test_obj.consolidate_matched()
         assert_frame_equal(self.test_obj.pair_df, compare)
 
+    def test_enforce_pairdf_type(self):
+        self.test_obj.pair_df = pd.DataFrame({'crawl_date':['2023-01-01'],'Farfetch_product_name':[1], 'Ounass_product_name':['a']})
+        self.test_obj.enforce_pairdf_dtype()
+        compare = pd.DataFrame({'crawl_date':['2023-01-01'],'Farfetch_product_name':['1'], 'Ounass_product_name':['a']})
+        compare = compare.astype('string')
+        assert_frame_equal(compare, self.test_obj.pair_df)
+
+
+
 
 if __name__ == '__main__':
     unittest.main()

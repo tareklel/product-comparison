@@ -12,6 +12,18 @@ schema:
     "product_name",
     "text",
   ]
+schema_dtypes:
+  {
+    "crawl_date": "string",
+    "country":"string",
+    "gender":"string",
+    "brand":"string",
+    "category":"string",
+    "site":"string",
+    "portal_itemid":"string",
+    "product_name":"string",
+    "text":"string",
+  }
 pivot: { "pivot": "site", "pivot_unique": "portal_itemid" }
 images_dest:
   {

@@ -93,8 +93,8 @@ class PoolForComparison:
         self.pair_file = file['pair_file_dest'] + \
             (file['product_tree'].split('.')[0]).split('/')[-1]
         self.pair_file = self.pair_file + '_match.csv'
-        print(self.pair_file)
         self.schema = file['schema']
+        self.dtypes = file['schema_dtypes']
         # pivot defines where the tree splits to reveal the dimensions we're trying to compare
         self.pivot = file['pivot']
         self.file = file
@@ -123,7 +123,7 @@ class PoolForComparison:
     def load_pair_file(self):
         if not hasattr(self, 'pair_df'):
             self.pair_df = pd.read_csv(self.pair_file)
-            self.pair_df[self.split_columns] = self.pair_df[self.split_columns].astype(str)
+            self.enforce_pairdf_dtype()
         else:
             print('pair file already exists and loaded')
 
@@ -162,8 +162,10 @@ class PoolForComparison:
     def remove_matched_from_tree(self):
         if not self.pair_df.empty:
             matched = self.matched_to_tree()
-            print(matched)
             target_level = find_level(self.product_tree, self.pivot['pivot_unique']) + 1
+            print(matched)
+            print(target_level)
+            print(self.product_tree)
             remove_from_tree(self.product_tree, matched, 1 ,target_level)
         else:
             print('pair_df is empty')
@@ -290,6 +292,17 @@ class PoolForComparison:
             keep='first').reset_index(drop=True)
         # reset matched to blank
         self.matched = []
+    
+    def enforce_pairdf_dtype(self):
+        for column, dtype in self.dtypes.items():
+            if column in self.pair_df.columns:
+                self.pair_df[column] = self.pair_df[column].astype(dtype)
+        for column in self.split_columns:
+            if self.pair_df[column].dtype == 'float64':
+                # split_columns should be integers or text
+                self.pair_df[column] = self.pair_df[column].astype('Int64')
+            self.pair_df[column] = self.pair_df[column].astype(self.dtypes[self.pivot['pivot_unique']])
 
     def save_pair_df(self):
+        self.enforce_pairdf_dtype()
         self.pair_df.to_csv(self.pair_file, index=False)
