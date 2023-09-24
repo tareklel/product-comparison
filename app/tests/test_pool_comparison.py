@@ -267,8 +267,6 @@ class TestSetupComparison(unittest.TestCase):
         assert_frame_equal(compare, self.test_obj.pair_df)
 
 
-
-
 if __name__ == '__main__':
     unittest.main()
 

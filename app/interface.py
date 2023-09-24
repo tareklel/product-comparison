@@ -44,16 +44,27 @@ class GuiPoolForComparison(tk.Toplevel):
         self.pool.remove_matched_from_tree()
         self.pool.get_unpaired()
         self.options = list(self.pool.describe_unpaired)
+        self.select_group_button = "Select group"
 
         # Create a StringVar to hold the selected value
         self.selected_value = tk.StringVar(self)
-        self.selected_value.set("Select group")  # default value
+        self.selected_value.set(self.select_group_button)  # default value
         # Create the dropdown menu
         self.dropdown = tk.OptionMenu(self, self.selected_value, *self.options)
-        self.dropdown.pack()
+        self.dropdown.pack()    
+
+        # Label to display the selected item
+        self.label_text = tk.StringVar()
+        self.info_label = tk.Label(self, textvar=self.label_text)
+        self.info_label.pack(pady=20)
+
+        # attach trace to selected value
+        self.selected_value.trace("w", self.dropdown_info)
+
         # Create the 'Select' button
-        select_button = tk.Button(
-            self, text="Select", command=lambda: self.select_group(selected_value.get()))
+        #select_button = tk.Button(
+        #    self, text="Select", command=lambda: self.select_group(list(self.selected_value.get())[0]))
+        select_button = tk.Button(self, text="Select", command=lambda: self.select_group(self.selected_value.get()))
         select_button.pack()
 
         print_matched = tk.Button(
@@ -63,6 +74,15 @@ class GuiPoolForComparison(tk.Toplevel):
         consolidate = tk.Button(
             self, text="Consolidate and Save", command=self.consolidate_and_save)
         consolidate.pack()
+
+    def dropdown_info(self, *args):
+        if self.selected_value.get() == self.select_group_button:
+            self.label_text.set('')
+        else:
+            info = self.pool.describe_unpaired[(self.selected_value.get())]
+            self.label_text.set(info)
+
+
 
     def select_group(self, selected_value):
         if any(selected_value in d for d in self.pool.matched):
@@ -74,19 +94,25 @@ class GuiPoolForComparison(tk.Toplevel):
             self.pool.start_compare_pool(selected_value)
 
         GuiComparePool(self.pool)
-    
+
     def print_matched(self):
         print(self.pool.matched)
-    
+
     def consolidate_and_save(self):
         self.pool.consolidate_matched()
         self.pool.save_pair_df()
         # Create a StringVar to hold the selected value
         self.dropdown['menu'].delete(0, 'end')
-        self.selected_value.set("Select group")  # default value
+        self.selected_value.set(self.select_group_button)  # default value
+        del self.pool.pair_df
+        self.pool.create_pair_file()
+        self.pool.remove_matched_from_tree()
+        self.pool.get_unpaired()
+        self.options = list(self.pool.describe_unpaired)
         # Create the dropdown menu
         for option in self.options:
-            self.dropdown['menu'].add_command(label=option, command = tk._setit(self.selected_value, option))
+            self.dropdown['menu'].add_command(
+                label=option, command=tk._setit(self.selected_value, option))
 
 
 class GuiComparePool(tk.Toplevel):
@@ -173,22 +199,9 @@ class GuiComparePool(tk.Toplevel):
         self.frame1 = tk.Frame(self.canvas_compare2)
         self.frame1.grid(sticky='w', row=0, column=0)
         self.image2_dict = {}
-        for i, (key, value) in enumerate(self.obj.product_b_list.items()):
-            tk.Radiobutton(self.frame1,
-                           text=key,
-                           variable=self.radio_selected_key,
-                           value=key).grid(sticky='ns', row=i * 2, column=0)
-            tk.Label(self.frame1, text=value, wraplength=600).grid(
-                sticky='ns', row=i * 2 + 1, column=0)
-            # get image for compare a
-            image_b = self.get_images(
-                self.obj.second_group_key, key)
-            if image_b:
-                self.image2_dict[key] = image_b
-                self.imageb_label = tk.Label(
-                    self.frame1, image=self.image2_dict[key])
-                self.imageb_label.grid(sticky='ns', row=i * 2 + 1, column=1)
 
+        self.sort_product_b_list_refresh()
+        
         self.canvas_compare2.create_window(
             (0, 0), window=self.frame1, anchor="nw")
 
@@ -230,21 +243,47 @@ class GuiComparePool(tk.Toplevel):
         self.compare_a_description.config(
             text=self.obj.compare_a[next(iter(self.obj.compare_a))], wraplength=600)
 
+        self.sort_product_b_list_refresh()
+
         # get image for compare a
         self.image_a = self.get_images(
             self.obj.first_group_key, next(iter(self.obj.compare_a)))
         if self.image_a:
             self.image1_label.config(image=self.image_a)
-    
+
     def clear_frame(self, frame):
         for widget in frame.winfo_children():
             widget.destroy()
-    
+
     def match_products(self, product):
+        if product not in self.obj.product_b_list:
+            # display message that product not in list
+            self.obj.select_match(product)
+            return
+        # otherwise match products and display new product list
         self.obj.select_match(product)
         self.clear_frame(self.frame1)
         self.image2_dict = {}
         self.next_compare_product()
+        self.sort_product_b_list_refresh()
+        
+    def sort_product_b_list_refresh(self):
+        """
+        sort and refresh product_b_list based on latest product_a
+        """
+        for widget in self.frame1.winfo_children():
+            widget.destroy()
+        
+        if not self.obj.product_b_list:
+            return
+
+        # sort product_b_list based on jaccard similarity of text, most similar on top
+        self.obj.product_b_list = {k: v for k, v in sorted(self.obj.product_b_list.items(),
+                                                       key=lambda item: self.jaccard_similarity(
+                                                           str(item[1]), str(self.obj.compare_a[next(iter(self.obj.compare_a))])),
+                                                       reverse=True)}
+        
+        # add in the products to the radio button including imagery
         for i, (key, value) in enumerate(self.obj.product_b_list.items()):
             tk.Radiobutton(self.frame1,
                            text=key,
@@ -260,7 +299,20 @@ class GuiComparePool(tk.Toplevel):
                 self.imageb_label = tk.Label(
                     self.frame1, image=self.image2_dict[key])
                 self.imageb_label.grid(sticky='ns', row=i * 2 + 1, column=1)
-    
+        self.canvas_compare2.yview_moveto(0)
+
+    def jaccard_similarity(self, str1, str2):
+        set1 = set(str1.split())
+        set2 = set(str2.split())
+        
+        intersection = len(set1 & set2)
+        union = len(set1 | set2)
+        
+        if union == 0:
+            return 0
+        else:
+            return intersection / union
+
     def save_close(self):
         self.pool.update_matched()
         self.destroy()
@@ -270,10 +322,4 @@ class GuiComparePool(tk.Toplevel):
 if __name__ == '__main__':
     root = tk.Tk()
     app = LoadPage(root)
-    # initiate steps after to continue testing
-    app.pool_object = PoolForComparison(
-        'app/tests/resources/pool_for_comparison_gui.yml')
-    pool = GuiPoolForComparison(app)
-    pool.select_group(
-        'crawl_date.2023-06-18.country.sa.gender.women.brand.Burberry.category.shoes.site')
     root.mainloop()

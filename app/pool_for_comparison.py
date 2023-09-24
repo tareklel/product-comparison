@@ -57,7 +57,7 @@ class ComparePool:
     def select_match(self, product_name):
         """Identify and store matched items."""
         if product_name not in self.product_b_list:
-            print('Object not found in list')
+            print('Object not found in list or no item selected')
             return
         self.store_matched_item(product_name)
 
@@ -163,9 +163,6 @@ class PoolForComparison:
         if not self.pair_df.empty:
             matched = self.matched_to_tree()
             target_level = find_level(self.product_tree, self.pivot['pivot_unique']) + 1
-            print(matched)
-            print(target_level)
-            print(self.product_tree)
             remove_from_tree(self.product_tree, matched, 1 ,target_level)
         else:
             print('pair_df is empty')
