@@ -15,7 +15,7 @@ class TestSetupComparison(unittest.TestCase):
 
         with open('app/tests/resources/json/test_fetch_unpaired_group_mini.json') as f:
             compare = json.load(f)
-    
+
         try:
             os.remove(
                 'app/tests/resources/output/farfetch_mini_ounass_mini_match.csv')
@@ -48,7 +48,6 @@ class TestSetupComparison(unittest.TestCase):
     def test_select_match(self):
         # Select the first comparison group for testing
         self.test_compare.select_compare_a()
-
         # Select the second comparison group for testing
         self.test_compare.select_compare_b()
 
@@ -96,7 +95,7 @@ class TestSetupComparison(unittest.TestCase):
 
         # Assert that the printed message matches our expectation
         self.assertEqual(buffer.getvalue(),
-                         'No more keys to compare in the first group.\n')
+                         f'None to select next\n')
 
     def test_return_pairs(self):
         # Select the first comparison group for testing
@@ -135,7 +134,7 @@ class TestSetupComparison(unittest.TestCase):
             }
         }
         self.assertEqual(self.test_compare.compare_a, test2)
-    
+
     # TEST PoolForComparison
 
     def test_create_pair_file(self):
@@ -143,6 +142,37 @@ class TestSetupComparison(unittest.TestCase):
             'app/tests/resources/compare/farfetch_mini_ounass_mini_match.csv')
         self.test_obj.create_pair_file()
         assert_frame_equal(self.test_obj.pair_df, test_df, check_dtype=False)
+ 
+    def test_matched_to_singles(self):
+        df = pd.read_csv(
+            'app/tests/resources/compare/test_consolidate_matched.csv')
+        self.test_obj.pair_df = df
+        match = pd.read_csv('app/tests/resources/compare/test_matched_to_singles.csv')
+        assert_frame_equal(self.test_obj.matched_to_singles(), match)
+
+    def test_matched_to_tree(self):
+        df = pd.read_csv(
+            'app/tests/resources/compare/test_consolidate_matched.csv'
+        )
+        self.test_obj.pair_df = df
+        test_tree = self.test_obj.matched_to_tree()
+        with open('app/tests/resources/json/test_matched_to_tree.json') as f:
+            compare = json.load(f)
+        self.assertEqual(test_tree, compare)
+
+    def test_remove_matched_from_tree(self):
+        df = pd.read_csv(
+            'app/tests/resources/compare/test_consolidate_matched.csv'
+        )
+
+        self.test_obj.pair_df = df
+        with open('app/tests/resources/json/test_remove_matched_to_tree_product_tree.json') as f: 
+            self.test_obj.product_tree = json.load(f)
+
+        with open('app/tests/resources/json/test_remove_matched_to_tree.json') as f:
+            compare = json.load(f)
+        self.test_obj.remove_matched_from_tree()
+        self.assertEqual(self.test_obj.product_tree, compare)
 
     def test_get_unpaired(self):
         compare = {'crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site': {'Farfetch.product_name': 33,
@@ -160,12 +190,6 @@ class TestSetupComparison(unittest.TestCase):
         self.assertEqual(asserted_pair, compare)
 
     def test_select_group_name(self):
-
-        self.test_obj.select_group_name()
-        self.assertEqual(self.test_obj.group_name_selected,
-                         'crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site')
-
-    def test_select_group_name(self):
         self.test_obj.select_group_name()
         self.test_obj.select_next_group_name()
         self.assertEqual(self.test_obj.group_name_selected, 'crawl_date.2023-06-18.country.sa.gender.women.brand.KENZO.category.shoes.site'
@@ -173,15 +197,8 @@ class TestSetupComparison(unittest.TestCase):
         self.test_obj.select_next_group_name()
         self.assertEqual(self.test_obj.group_name_selected,
                          'crawl_date.2023-06-18.country.sa.gender.women.brand.Burberry.category.shoes.site')
-        
-    def test_set_up_matched(self):
-        self.test_obj.set_up_matched()
-        df = pd.DataFrame(columns=self.test_obj.schema)
-        assert_frame_equal(self.test_obj.matched_df, df)
-        pd.DataFrame(columns=['b']).to_csv(self.test_obj.pair_file)
 
     def test_update_matched(self):
-        self.test_obj.set_up_matched()
         self.test_obj.comparepool = self.test_compare
         self.test_obj.comparepool.select_compare_a()
         self.test_obj.comparepool.select_compare_b()
@@ -195,18 +212,17 @@ class TestSetupComparison(unittest.TestCase):
     def test_rework_to_pair_file(self):
         self.test_obj.pair_file = 'app/tests/resources/compare/farfetch_mini_ounass_mini_match.csv'
         self.test_create_pair_file()
-        self.test_obj.set_up_matched()
         # use read matched dictionary
         with open('app/tests/resources/json/test_update_matched.json') as f:
             full = json.load(f)
         reworked = self.test_obj.rework_to_pair_file(full)
-        compare = pd.read_csv('app/tests/resources/compare/test_rework_to_pair.csv')
+        compare = pd.read_csv(
+            'app/tests/resources/compare/test_rework_to_pair.csv')
         assert_frame_equal(reworked, compare)
-        
-
 
     def test_consolidated_matched(self):
-        df = pd.read_csv('app/tests/resources/compare/test_consolidate_matched.csv')
+        df = pd.read_csv(
+            'app/tests/resources/compare/test_consolidate_matched.csv')
         # check when passing mathced pair to df with the pairs unmatched
         self.test_obj.pair_df = df.iloc[1:]
         with open('app/tests/resources/json/test_consolidate_matched.json') as f:
@@ -215,27 +231,44 @@ class TestSetupComparison(unittest.TestCase):
         self.test_obj.consolidate_matched()
         assert_frame_equal(self.test_obj.pair_df, df.iloc[:1])
 
-        # check when matched pair introduced and matched already in 
+        # check when matched pair introduced and matched already in
         self.test_obj.pair_df = df.iloc[:1]
         self.test_obj.matched = [d['scenario_1']]
         self.test_obj.consolidate_matched()
         assert_frame_equal(self.test_obj.pair_df, df.iloc[:1])
 
-        #check when unmatched introduced to matched pair
+        # check when unmatched introduced to matched pair
         self.test_obj.pair_df = df.iloc[1:]
         self.test_obj.matched = [d['scenario_2']]
         self.test_obj.consolidate_matched()
-        assert_frame_equal(self.test_obj.pair_df, df.iloc[1:].reset_index(drop=True))
+        assert_frame_equal(self.test_obj.pair_df,
+                           df.iloc[1:].reset_index(drop=True))
 
         # check when unmatched introduced to unmatched different
         self.test_obj.pair_df = df.iloc[1:2].reset_index(drop=True)
         self.test_obj.matched = [d['scenario_2']]
         self.test_obj.consolidate_matched()
-        assert_frame_equal(self.test_obj.pair_df, df.iloc[1:].reset_index(drop=True))
+        assert_frame_equal(self.test_obj.pair_df,
+                           df.iloc[1:].reset_index(drop=True))
+        
+        # check when matched and unmatched consolidated
+        self.test_obj.pair_df = df.iloc[0:0]
+        compare = pd.read_csv('app/tests/resources/compare/test_consolidate_matched_2.csv')
+        self.test_obj.matched = [d['scenario_3']]
+        self.test_obj.consolidate_matched()
+        assert_frame_equal(self.test_obj.pair_df, compare)
+
+    def test_enforce_pairdf_type(self):
+        self.test_obj.pair_df = pd.DataFrame({'crawl_date':['2023-01-01'],'Farfetch_product_name':[1], 'Ounass_product_name':['a']})
+        self.test_obj.enforce_pairdf_dtype()
+        compare = pd.DataFrame({'crawl_date':['2023-01-01'],'Farfetch_product_name':['1'], 'Ounass_product_name':['a']})
+        compare = compare.astype('string')
+        assert_frame_equal(compare, self.test_obj.pair_df)
+
 
 if __name__ == '__main__':
     unittest.main()
-    
+
     try:
         os.remove(
             'app/tests/resources/output/farfetch_mini_ounass_mini_match.csv')

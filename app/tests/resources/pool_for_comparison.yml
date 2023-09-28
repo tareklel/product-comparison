@@ -1,4 +1,25 @@
 product_tree: "app/tests/resources/json/farfetch_mini_ounass_mini.json"
 pair_file_dest: "app/tests/resources/output/"
-schema: ['crawl_date', 'country', 'gender', 'brand', 'category', 'site', 'product_name']
-pivot: {'pivot':'site', 'pivot_unique':'product_name'}
+schema:
+  [
+    "crawl_date",
+    "country",
+    "gender",
+    "brand",
+    "category",
+    "site",
+    "product_name",
+    "text",
+  ]
+pivot: { "pivot": "site", "pivot_unique": "product_name" }
+schema_dtypes:
+  {
+    "crawl_date": "string",
+    "country":"string",
+    "gender":"string",
+    "brand":"string",
+    "category":"string",
+    "site":"string",
+    "product_name":"string",
+    "text":"string",
+  }

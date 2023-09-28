@@ -1,0 +1,34 @@
+{
+    "crawl_date": {
+        "2023-06-18": {
+            "country": {
+                "sa": {
+                    "gender": {
+                        "women": {
+                            "brand": {
+                                "KENZO": {
+                                    "category": {
+                                        "shoes": {
+                                            "site": {
+                                                "Farfetch": {
+                                                    "product_name": {
+                                                        "panelled-design sneakers": {}
+                                                    }
+                                                },
+                                                "Ounass": {
+                                                    "product_name": {
+                                                        "Kenzoschool Boke Flower Slip-on Sneakers in Canvas": {}
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

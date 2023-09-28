@@ -4,3 +4,4 @@ output/*
 **/__pycache__/
 .vscode
 scratch.ipynb
+**/gui_dir/*
