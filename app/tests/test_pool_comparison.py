@@ -48,7 +48,6 @@ class TestSetupComparison(unittest.TestCase):
     def test_select_match(self):
         # Select the first comparison group for testing
         self.test_compare.select_compare_a()
-
         # Select the second comparison group for testing
         self.test_compare.select_compare_b()
 
@@ -96,7 +95,7 @@ class TestSetupComparison(unittest.TestCase):
 
         # Assert that the printed message matches our expectation
         self.assertEqual(buffer.getvalue(),
-                         f'No more keys to compare in the first group.\n')
+                         f'None to select next\n')
 
     def test_return_pairs(self):
         # Select the first comparison group for testing

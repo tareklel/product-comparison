@@ -24,13 +24,13 @@ class ComparePool:
         """Select an item from the first key and store it in compare_a attribute."""
         self.select_item_for_comparison(self.first_group_key, 'compare_a')
 
-    def select_item_for_comparison(self, key_name, attr_name):
+    def select_item_for_comparison(self, key_name, compare_a):
         """Helper method to select an item for comparison."""
         if not self.group or not self.group[key_name]:
             print(f'No more keys to compare in the first group.')
             return
         item_key = next(iter(self.group[key_name]))
-        setattr(self, attr_name, {item_key: self.group[key_name][item_key]})
+        setattr(self, compare_a, {item_key: self.group[key_name][item_key]})
 
     def select_compare_b(self):
         """Select items from the second key and store them in product_b_list attribute."""
@@ -40,19 +40,18 @@ class ComparePool:
         """Select the next item in the first group for comparison."""
         self.select_next_item_for_comparison(self.first_group_key, 'compare_a')
 
-    def select_next_item_for_comparison(self, key_name, attr_name):
+    def select_next_item_for_comparison(self, key_name, compare_a):
         """Helper method to select the next item for comparison."""
         if not self.group[key_name] or len(self.group[key_name]) <= 1:
             print('None to select next')
             return
-
         keys = list(self.group[key_name].keys())
-        start_key = list(getattr(self, attr_name).keys())[0]
+        start_key = list(getattr(self, compare_a).keys())[0]
         start_index = keys.index(start_key)
 
         # Get the next key
         next_key = keys[(start_index + 1) % len(keys)]
-        setattr(self, attr_name, {next_key: self.group[key_name][next_key]})
+        setattr(self, compare_a, {next_key: self.group[key_name][next_key]})
 
     def select_match(self, product_name):
         """Identify and store matched items."""
@@ -64,6 +63,9 @@ class ComparePool:
     def store_matched_item(self, product_name):
         """Helper method to store matched items."""
         key_from_compare_a = next(iter(self.compare_a))
+
+        self.select_next_a()
+
         value_from_compare_a = self.group[self.first_group_key].pop(
             key_from_compare_a)
         value_from_product_b_list = self.product_b_list.pop(product_name)
@@ -73,9 +75,9 @@ class ComparePool:
             self.second_group_key: {product_name: value_from_product_b_list}
         }
         self.matched.append(matched_item)
-
         # Select the next 'a' for further comparison
-        self.select_compare_a()
+        # self.select_compare_a()
+        # self.select_next_a()
 
     def return_pairs(self):
         """Return both matched and unmatched items."""
