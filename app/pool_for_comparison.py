@@ -75,9 +75,6 @@ class ComparePool:
             self.second_group_key: {product_name: value_from_product_b_list}
         }
         self.matched.append(matched_item)
-        # Select the next 'a' for further comparison
-        # self.select_compare_a()
-        # self.select_next_a()
 
     def return_pairs(self):
         """Return both matched and unmatched items."""
