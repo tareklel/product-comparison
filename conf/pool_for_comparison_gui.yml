@@ -1,0 +1,32 @@
+product_tree: "output/farfetch-2023-06-18_ounass-2023-06-18.json"
+pair_file_dest: "output/"
+schema:
+  [
+    "crawl_date",
+    "country",
+    "gender",
+    "brand",
+    "category",
+    "site",
+    "portal_itemid",
+    "product_name",
+    "text",
+  ]
+schema_dtypes:
+  {
+    "crawl_date": "string",
+    "country":"string",
+    "gender":"string",
+    "brand":"string",
+    "category":"string",
+    "site":"string",
+    "portal_itemid":"string",
+    "product_name":"string",
+    "text":"string",
+  }
+pivot: { "pivot": "site", "pivot_unique": "portal_itemid" }
+images_dest:
+  {
+    "Farfetch": "input/images/farfetch/2023-06-18",
+    "Ounass": "input/images/ounass/2023-06-18",
+  }

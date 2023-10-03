@@ -207,8 +207,12 @@ class GuiComparePool(tk.Toplevel):
 
         # Update the scrollregion after configuring the interior frame
         self.frame1.update_idletasks()
+        self.canvas_compare2.bind_all("<MouseWheel>", self._on_mousewheel)
         self.canvas_compare2.config(
             scrollregion=self.canvas_compare2.bbox("all"))
+        
+        
+        
 
         # Add a button to print the selected value
         self.radio_select = tk.Button(
@@ -292,8 +296,11 @@ class GuiComparePool(tk.Toplevel):
             tk.Label(self.frame1, text=value, wraplength=600).grid(
                 sticky='ns', row=i * 2 + 1, column=0)
             # get image for compare a
-            image_b = self.get_images(
-                self.obj.second_group_key, key)
+            try:
+                image_b = self.get_images(
+                    self.obj.second_group_key, key)
+            except IndexError:
+                image_b = None
             if image_b:
                 self.image2_dict[key] = image_b
                 self.imageb_label = tk.Label(
@@ -317,9 +324,6 @@ class GuiComparePool(tk.Toplevel):
         self.pool.update_matched()
         self.destroy()
 
+    def _on_mousewheel(self, event):
+        self.canvas_compare2.yview_scroll(-event.delta, "units")
 
-# Create Tkinter window and the app instance
-if __name__ == '__main__':
-    root = tk.Tk()
-    app = LoadPage(root)
-    root.mainloop()

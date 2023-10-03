@@ -11,8 +11,8 @@ data_config:
       "product_name",
       "text"
     ]
-portals: ["Ounass", "Farfetch"]
-input_path: "input/"
+portals: ["Farfetch", "Ounass"]
+input_path: "input/mini/"
 output_path: "output/"
 standard: "standard"
 dictionary_dir: "dictionary/"
