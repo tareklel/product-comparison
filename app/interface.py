@@ -145,6 +145,10 @@ class GuiComparePool(tk.Toplevel):
 
         self.next_button = tk.Button(
             self.frame, text='Next Compare Product', command=self.next_compare_product)
+        
+        # press m to match
+        self.bind("<n>", lambda event: self.next_compare_product())
+
         self.save_close_button = tk.Button(
             self.frame, text='Save and Close', command=self.save_close)
         self.next_button.grid(sticky='w', row=0, column=3)
@@ -209,17 +213,17 @@ class GuiComparePool(tk.Toplevel):
         self.frame1.update_idletasks()
         self.canvas_compare2.bind_all("<MouseWheel>", self._on_mousewheel)
         self.canvas_compare2.config(
-            scrollregion=self.canvas_compare2.bbox("all"))
-        
-        
-        
+            scrollregion=self.canvas_compare2.bbox("all"))    
 
-        # Add a button to print the selected value
+        # Add a button to match products
         self.radio_select = tk.Button(
             self.frame, text="Match products", command=lambda: self.match_products(self.radio_selected_key.get()))
+        self.radio_select.grid(sticky='w', row=0, column=2)        
 
-        self.radio_select.grid(sticky='w', row=0, column=2)
+        # press m to match
+        self.bind("<m>", lambda event: self.match_products(self.radio_selected_key.get()))
 
+    
     def get_image_files(self, directory, extensions=['.jpg', '.png', '.gif']):
         return [os.path.join(directory, f) for f in os.listdir(directory)
                 if os.path.isfile(os.path.join(directory, f)) and any(f.lower().endswith(ext) for ext in extensions)]
