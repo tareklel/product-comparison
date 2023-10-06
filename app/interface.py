@@ -274,7 +274,6 @@ class GuiComparePool(tk.Toplevel):
         # otherwise match products and display new product list
         self.obj.select_match(product)
         self.clear_frame(self.frame1)
-        self.image2_dict = {}
         self.next_compare_product()
         self.sort_product_b_list_refresh()
 
@@ -303,16 +302,21 @@ class GuiComparePool(tk.Toplevel):
             tk.Label(self.frame1, text=value, wraplength=200).grid(
                 sticky='ns', row=i//3 * 2 + 1, column=i % 3 * 2)
             # get image for compare a
-            try:
-                image_b = self.get_images(
-                    self.obj.second_group_key, key)
-            except IndexError:
-                image_b = None
-            if image_b:
-                self.image2_dict[key] = image_b
+            if key in self.image2_dict:
                 self.imageb_label = tk.Label(
                     self.frame1, image=self.image2_dict[key])
                 self.imageb_label.grid(sticky='ns', row=i // 3 * 2 + 1, column=i % 3 * 2 + 1)
+            else:
+                try:
+                    image_b = self.get_images(
+                        self.obj.second_group_key, key)
+                except IndexError:
+                    image_b = None
+                if image_b:
+                    self.image2_dict[key] = image_b
+                    self.imageb_label = tk.Label(
+                        self.frame1, image=self.image2_dict[key])
+                    self.imageb_label.grid(sticky='ns', row=i // 3 * 2 + 1, column=i % 3 * 2 + 1)
         self.canvas_compare2.yview_moveto(0)
 
     def match_percentage(self, str1, str2):
