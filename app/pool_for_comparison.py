@@ -98,12 +98,14 @@ class PoolForComparison:
         self.pivot = file['pivot']
         self.file = file
         self.matched = []
+        self.reverse=file['reverse']
 
         # get the pivot columns for comparing pairs
         self.identifiers = sorted(list(get_keys_within_key(
-            self.product_tree, self.pivot['pivot'])))
+            self.product_tree, self.pivot['pivot'])), reverse=self.reverse)
         self.split_columns = sorted(
-            [f"{x}_{self.pivot['pivot_unique']}" for x in self.identifiers])
+            [f"{x}_{self.pivot['pivot_unique']}" for x in self.identifiers], reverse=self.reverse)
+        
 
     def create_pair_file(self):
         """ Create a CSV file to store product pairings if it doesn't exist """
@@ -192,7 +194,7 @@ class PoolForComparison:
         group = {}
 
         # Populate the group dictionary with relevant data based on the pivot key
-        for key in data.keys():
+        for key in sorted(list(data.keys()), reverse=self.reverse):
             group[key] = data[key][self.pivot['pivot_unique']]
 
         # Return the constructed group
@@ -203,7 +205,7 @@ class PoolForComparison:
         self.get_unpaired()
         if len(list(self.describe_unpaired.keys())) > 0:
             self.group_name_selected = sorted(
-                list(self.describe_unpaired.keys()))[0]
+                list(self.describe_unpaired.keys()), reverse=self.reverse)[0]
         else:
             print('No more unpaired')
 

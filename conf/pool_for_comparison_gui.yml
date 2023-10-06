@@ -30,3 +30,5 @@ images_dest:
     "Farfetch": "input/images/farfetch/2023-06-18",
     "Ounass": "input/images/ounass/2023-06-18",
   }
+
+reverse: True
