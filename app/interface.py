@@ -112,6 +112,7 @@ class GuiPoolForComparison(tk.Toplevel):
         for option in self.options:
             self.dropdown['menu'].add_command(
                 label=option, command=tk._setit(self.selected_value, option))
+        print('Consolidated and Saved')
 
 
 class GuiComparePool(tk.Toplevel):
@@ -333,6 +334,7 @@ class GuiComparePool(tk.Toplevel):
 
     def save_close(self):
         self.pool.update_matched()
+        del self.image2_dict
         self.destroy()
 
     def _on_mousewheel(self, event):
