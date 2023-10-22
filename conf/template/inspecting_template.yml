@@ -1,7 +1,6 @@
 data_config:
   inpsection_order:
     [
-      "crawl_date",
       "country",
       "gender",
       "brand",
@@ -11,8 +10,8 @@ data_config:
       "product_name",
       "text"
     ]
-portals: ["Farfetch", "Ounass"]
-input_path: "input/mini/"
+portals: ["Ounass", "Farfetch"]
+input_path: "input/"
 output_path: "output/"
 standard: "standard"
 dictionary_dir: "dictionary/"

@@ -197,6 +197,9 @@ class GuiComparePool(tk.Toplevel):
         self.canvas_compare2.grid(sticky='w', row=8-6, column=1)
         self.compare_2_scrollbar = tk.Scrollbar(
             self.frame2, orient="vertical", command=self.canvas_compare2.yview)
+        
+        self.bind("<Up>", lambda event: self.canvas_compare2.yview_scroll(-1, 'units'))
+        self.bind("<Down>", lambda event: self.canvas_compare2.yview_scroll(1, 'units'))
 
         # Configure the canvas
         self.canvas_compare2.config(

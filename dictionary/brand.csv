@@ -1,6 +1,6 @@
 standard,Ounass,Farfetch
 Chloé,Chloé,Chloé
-Adidas,Adidas,adidas
+Adidas,adidas,Adidas
 Alexander McQueen,Alexander McQueen,Alexander McQueen
 Miu Miu,Miu Miu,Miu Miu
 Balenciaga,Balenciaga,Balenciaga
@@ -12,7 +12,7 @@ SAINT LAURENT,SAINT LAURENT,Saint Laurent
 BOSS,BOSS,BOSS
 Christian Louboutin,Christian Louboutin,
 Valentino Garavani,Valentino Garavani,Valentino Garavani
-Golden Goose Deluxe Brand,Golden Goose Deluxe Brand,Golden Goose
+Golden Goose,GOLDEN GOOSE,Golden Goose Deluxe Brand
 Malone Souliers,Malone Souliers,Malone Souliers
 Lacoste,Lacoste,Lacoste
 Armani Exchange,Armani Exchange,Armani Exchange
@@ -22,7 +22,7 @@ Autry,Autry,Autry
 Stella McCartney,Stella McCartney,Stella McCartney
 Off-White,Off-White,Off-White
 Ferragamo,Ferragamo,Ferragamo
-Puma,Puma,
+Puma,Puma,PUMA
 KENZO,KENZO,Kenzo
 Tory Burch,Tory Burch,Tory Burch
 Brunello Cucinelli,Brunello Cucinelli,Brunello Cucinelli
@@ -46,3 +46,5 @@ Coach,Coach,Coach
 MCM,MCM,MCM
 Gucci,Gucci,Gucci
 New Balance,New Balance,New Balance
+Converse,Converse,Converse
+Reebok,Reebok,Reebok
