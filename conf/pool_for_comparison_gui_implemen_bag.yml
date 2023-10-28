@@ -1,5 +1,5 @@
-product_tree: "output/womens_sneakers_ounass_farfetch/farfetch-2023-10-18_ounass-2023-10-20.json"
-pair_file_dest: "output/womens_sneakers_ounass_farfetch/"
+product_tree: "output/womens_bags_ounass_farfetch/farfetch-2023-10-26_ounass-2023-10-26.json"
+pair_file_dest: "output/womens_bags_ounass_farfetch/"
 schema:
   [
     "country",
@@ -25,8 +25,8 @@ schema_dtypes:
 pivot: { "pivot": "site", "pivot_unique": "portal_itemid" }
 images_dest:
   {
-    "Farfetch": "input/womens_sneakers_ounass_farfetch/images/farfetch/2023-10-18",
-    "Ounass": "input/womens_sneakers_ounass_farfetch/images/ounass/2023-10-20",
+    "Farfetch": "input/womens_bags_ounass_farfetch/images/farfetch/2023-10-26",
+    "Ounass": "input/womens_bags_ounass_farfetch/images/ounass/2023-10-26",
   }
 
 reverse: True

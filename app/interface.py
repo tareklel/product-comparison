@@ -155,6 +155,9 @@ class GuiComparePool(tk.Toplevel):
         self.next_button.grid(sticky='w', row=0, column=3)
         self.save_close_button.grid(sticky='w', row=0, column=4)
 
+        self.reverse_button = tk.Button(self.frame, text= 'Reverse Displayed Products', command=self.reverse_order)
+        self.reverse_button.grid(sticky='w', row=0, column=5)
+
         # add for spacing
         empty_frame = tk.Frame(self.frame, height=20, width=20)
         empty_frame.grid(sticky='w', row=1, column=1)
@@ -192,9 +195,9 @@ class GuiComparePool(tk.Toplevel):
         # Frame for radio buttons (using pack)
 
         # Create a canvas and a vertical scrollbar
-        self.canvas_compare2 = tk.Canvas(self.frame2, width=1200, height=500)
+        self.canvas_compare2 = tk.Canvas(self.frame2, width=1400, height=750)
 
-        self.canvas_compare2.grid(sticky='w', row=8-6, column=1)
+        self.canvas_compare2.grid(sticky='ws', row=8-6, column=1)
         self.compare_2_scrollbar = tk.Scrollbar(
             self.frame2, orient="vertical", command=self.canvas_compare2.yview)
         
@@ -231,6 +234,9 @@ class GuiComparePool(tk.Toplevel):
         self.bind("<m>", lambda event: self.match_products(
             self.radio_selected_key.get()))
 
+        # press r to reverse
+        self.bind("<r>", lambda event: self.reverse_order())
+
     def get_image_files(self, directory, extensions=['.jpg', '.png', '.gif']):
         return [os.path.join(directory, f) for f in os.listdir(directory)
                 if os.path.isfile(os.path.join(directory, f)) and any(f.lower().endswith(ext) for ext in extensions)]
@@ -265,6 +271,9 @@ class GuiComparePool(tk.Toplevel):
             self.obj.first_group_key, next(iter(self.obj.compare_a)))
         if self.image_a:
             self.image1_label.config(image=self.image_a)
+    
+    def reverse_order(self):
+        self.sort_product_b_list_refresh(reverse=False)
 
     def clear_frame(self, frame):
         for widget in frame.winfo_children():
@@ -281,7 +290,7 @@ class GuiComparePool(tk.Toplevel):
         self.next_compare_product()
         self.sort_product_b_list_refresh()
 
-    def sort_product_b_list_refresh(self):
+    def sort_product_b_list_refresh(self, reverse=True):
         """
         sort and refresh product_b_list based on latest product_a
         """
@@ -295,7 +304,7 @@ class GuiComparePool(tk.Toplevel):
         self.obj.product_b_list = {k: v for k, v in sorted(self.obj.product_b_list.items(),
                                                            key=lambda item: self.match_percentage(
                                                            str(item[1]), str(self.obj.compare_a[next(iter(self.obj.compare_a))])),
-                                                           reverse=True)}
+                                                           reverse=reverse)}
 
         # add in the products to the radio button including imagery
         for i, (key, value) in enumerate(self.obj.product_b_list.items()):
@@ -303,7 +312,7 @@ class GuiComparePool(tk.Toplevel):
                            text=key,
                            variable=self.radio_selected_key,
                            value=key).grid(sticky='ns', row=i//3 * 2, column=i % 3 * 2)
-            tk.Label(self.frame1, text=value, wraplength=200).grid(
+            tk.Label(self.frame1, text=value, wraplength=250).grid(
                 sticky='ns', row=i//3 * 2 + 1, column=i % 3 * 2)
             # get image for compare a
             if key in self.image2_dict:
@@ -321,6 +330,7 @@ class GuiComparePool(tk.Toplevel):
                     self.imageb_label = tk.Label(
                         self.frame1, image=self.image2_dict[key])
                     self.imageb_label.grid(sticky='ns', row=i // 3 * 2 + 1, column=i % 3 * 2 + 1)
+        
         self.canvas_compare2.yview_moveto(0)
 
     def match_percentage(self, str1, str2):

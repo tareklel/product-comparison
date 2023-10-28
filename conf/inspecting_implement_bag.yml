@@ -1,7 +1,6 @@
 data_config:
   inpsection_order:
     [
-      "crawl_date",
       "country",
       "gender",
       "brand",
@@ -12,9 +11,9 @@ data_config:
       "text"
     ]
 portals: ["Ounass", "Farfetch"]
-input_path: "input/"
-output_path: "output/"
+input_path: "input/womens_bags_ounass_farfetch"
+output_path: "output/womens_bags_ounass_farfetch"
 standard: "standard"
 dictionary_dir: "dictionary/"
 reference: "site"
-tree_path: "output/"
+tree_path: "output/womens_bags_ounass_farfetch"
